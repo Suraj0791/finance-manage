@@ -5,7 +5,10 @@ import { TransactionTable } from "../_components/transaction-table";
 import { notFound } from "next/navigation";
 import { AccountChart } from "../_components/account-chart";
 
-export default async function AccountPage({ params }) {
+export default async function AccountPage({ params: rawParams }) {
+  // Await and resolve params
+  const params = await rawParams;
+
   const accountData = await getAccountWithTransactions(params.id);
 
   if (!accountData) {
