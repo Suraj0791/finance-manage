@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# AI Finance App
 
-## Getting Started
+This AI Finance app provides users with a smart way to manage their finances. It features an interactive dashboard, transaction analysis, receipt scanning, budgeting tools, AI insights, and more. The app integrates several advanced technologies to offer a seamless experience for personal financial management.
 
-First, run the development server:
+#LIVE LINK :
+https://ai-finance-manage.vercel.app/
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Dashboard**: Visualize transactions and financial data using bar graphs and pie charts.
+- **Receipt Scanning**: Scan receipts using the AI Gemini API to automatically generate new transactions.
+- **Recurring Transactions**: Option to set up recurring transactions.
+- **Cron Jobs**: For transaction ingestion and data updates.
+- **Monthly Budgeting**: Set and track monthly budgets with email notifications.
+- **AI Insights**: Get AI-generated insights into your spending and budgeting patterns.
+- **Email Notifications**: Send budget-related emails using the Resend service and React Email.
+- **Rate Limiting**: Implemented using ArcJet for better API rate management.
+- **Authentication**: User authentication and middleware with Clerk for secure access.
+- **Multiple Accounts**: Support for managing multiple accounts and transactions.
+- **Transaction Analysis**: Comprehensive analysis of user transactions, categorized for easy tracking.
+- **Input Validation**: Zod and HookResolver are used for rigorous input validation to ensure data integrity.
+  
+## Technologies Used
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **Next.js**: React framework for building the user interface and handling server-side rendering.
+- **AI Gemini API**: For receipt scanning and AI-powered transaction creation.
+- **Clerk**: Authentication and middleware management.
+- **Prisma**: ORM for interacting with the database.
+- **Supabase**: PostgreSQL database and authentication service.
+- **ShadCN**: UI components for building clean, modern interfaces.
+- **Zod**: Input validation schema for ensuring data correctness.
+- **HookResolver**: Used in combination with Zod for resolving validation and form handling.
+- **ArcJet**: Rate limiting to prevent excessive API calls.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Installation
 
-## Learn More
+To set up this project locally, follow the steps below:
 
-To learn more about Next.js, take a look at the following resources:
+1. Clone the repository:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    ```bash
+    git clone https://github.com/yourusername/ai-finance-app.git
+    cd ai-finance-app
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. Install dependencies:
 
-## Deploy on Vercel
+    ```bash
+    npm install --legacy-peer-deps 
+    //as new version of next is having some issues in npm i
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. Set up environment variables:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    Create a `.env.local` file in the root directory and add the following environment variables:
+
+    
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=sign-in 
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=sign-up
+DATABASE_URL=""
+DIRECT_URL=""        
+ARCJET_KEY=
+RESEND_API_KEY=
+
+GEMINI_API_KEY=
+
+4. Run the application locally:
+
+    ```bash
+    npm run dev
+    ```
+
+5. Open the app in your browser at [http://localhost:3000](http://localhost:3000).
+
+## Deployment
+
+To deploy this app on Vercel, follow these steps:
+
+1. Create a Vercel account and link your GitHub repository.
+2. Set the environment variables in Vercel as per the `.env.local` configuration.
+3. Deploy the application and access it using the provided Vercel URL.
+
+## Database Schema
+
+The app uses Prisma for database management. Below is the Prisma schema for the database:
+
+
+
+## Badges
+
+Add badges from somewhere like: [shields.io](https://shields.io/)
+
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
+[![AGPL License](https://img.shields.io/badge/license-AGPL-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)
+
