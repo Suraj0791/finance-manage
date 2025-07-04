@@ -199,7 +199,7 @@ export async function getGroupDetails(groupId) {
     // Serialize decimal fields
     const serializedGroup = {
       ...group,
-      expenses: group.expenses.map(expense => ({
+      expenses: group.expenses.map((expense) => ({
         ...serializeDecimal(expense),
         shares: expense.shares.map(serializeDecimal),
       })),
@@ -235,7 +235,9 @@ export async function inviteUserToGroup(groupId, email) {
     });
 
     if (!membership) {
-      throw new Error("You don't have permission to invite users to this group");
+      throw new Error(
+        "You don't have permission to invite users to this group"
+      );
     }
 
     // Check if user is already invited or member

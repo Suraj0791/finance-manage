@@ -12,10 +12,9 @@ import useFetch from "@/hooks/use-fetch";
 export function InvitationCard({ invitation }) {
   const { id, group, sender, createdAt, expiresAt } = invitation;
 
-  const {
-    loading: acceptLoading,
-    fn: acceptInvitationFn,
-  } = useFetch(acceptGroupInvitation);
+  const { loading: acceptLoading, fn: acceptInvitationFn } = useFetch(
+    acceptGroupInvitation
+  );
 
   const handleAccept = async () => {
     try {
@@ -61,18 +60,20 @@ export function InvitationCard({ invitation }) {
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Invitation Details */}
         <div className="flex items-center gap-2">
           <Avatar className="h-6 w-6">
             <AvatarImage src={sender.imageUrl} alt={sender.name} />
             <AvatarFallback className="text-xs bg-gradient-to-br from-gray-400 to-gray-600 text-white">
-              {sender.name?.charAt(0).toUpperCase() || sender.email?.charAt(0).toUpperCase()}
+              {sender.name?.charAt(0).toUpperCase() ||
+                sender.email?.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <p className="text-sm text-muted-foreground">
-            Invited by <span className="font-medium">{sender.name || sender.email}</span>
+            Invited by{" "}
+            <span className="font-medium">{sender.name || sender.email}</span>
           </p>
         </div>
 
@@ -86,16 +87,16 @@ export function InvitationCard({ invitation }) {
 
         {/* Action Buttons */}
         <div className="flex gap-2">
-          <Button 
-            onClick={handleAccept} 
+          <Button
+            onClick={handleAccept}
             disabled={acceptLoading}
             className="flex-1 gap-2"
           >
             <Check className="h-4 w-4" />
             Accept
           </Button>
-          <Button 
-            onClick={handleReject} 
+          <Button
+            onClick={handleReject}
             variant="outline"
             className="flex-1 gap-2"
           >

@@ -34,7 +34,7 @@ const formSchema = z.object({
 
 export function CreateGroupDialog() {
   const [open, setOpen] = useState(false);
-  
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -96,7 +96,7 @@ export function CreateGroupDialog() {
                 <FormItem>
                   <FormLabel>Description (Optional)</FormLabel>
                   <FormControl>
-                    <Textarea 
+                    <Textarea
                       placeholder="Add some details about this group..."
                       {...field}
                     />
@@ -114,7 +114,9 @@ export function CreateGroupDialog() {
                 Cancel
               </Button>
               <Button type="submit" disabled={createLoading}>
-                {createLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {createLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Create Group
               </Button>
             </div>

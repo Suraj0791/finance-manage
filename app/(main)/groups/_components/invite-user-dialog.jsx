@@ -32,7 +32,7 @@ const formSchema = z.object({
 
 export function InviteUserDialog({ groupId }) {
   const [open, setOpen] = useState(false);
-  
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -83,10 +83,10 @@ export function InviteUserDialog({ groupId }) {
                 <FormItem>
                   <FormLabel>Email Address</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="Enter user's email address" 
+                    <Input
+                      placeholder="Enter user's email address"
                       type="email"
-                      {...field} 
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -102,7 +102,9 @@ export function InviteUserDialog({ groupId }) {
                 Cancel
               </Button>
               <Button type="submit" disabled={inviteLoading}>
-                {inviteLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {inviteLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Send Invitation
               </Button>
             </div>

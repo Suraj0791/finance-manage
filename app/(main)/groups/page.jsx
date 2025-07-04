@@ -45,7 +45,7 @@ export default async function GroupsPage() {
           <Users className="h-5 w-5 text-green-600" />
           <h2 className="text-xl font-semibold">Your Groups</h2>
         </div>
-        
+
         {groups.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">

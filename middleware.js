@@ -16,4 +16,3 @@ export default clerkMiddleware(async (auth, req) => {
     return redirectToSignIn();
   }
 });
-

@@ -15,7 +15,10 @@ export function GroupHeader({ group }) {
     <Card>
       <CardHeader>
         <div className="flex items-start justify-between">
-          <Link href="/groups" className="flex items-center gap-2 text-muted-foreground hover:text-foreground">
+          <Link
+            href="/groups"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to Groups
           </Link>
@@ -47,21 +50,30 @@ export function GroupHeader({ group }) {
             <div className="flex items-center gap-4">
               <div className="flex -space-x-2">
                 {members.slice(0, 5).map((member) => (
-                  <Avatar key={member.id} className="h-8 w-8 border-2 border-white">
-                    <AvatarImage src={member.user.imageUrl} alt={member.user.name} />
+                  <Avatar
+                    key={member.id}
+                    className="h-8 w-8 border-2 border-white"
+                  >
+                    <AvatarImage
+                      src={member.user.imageUrl}
+                      alt={member.user.name}
+                    />
                     <AvatarFallback className="text-xs">
-                      {member.user.name?.charAt(0) || member.user.email?.charAt(0)}
+                      {member.user.name?.charAt(0) ||
+                        member.user.email?.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                 ))}
                 {members.length > 5 && (
                   <div className="h-8 w-8 rounded-full bg-muted border-2 border-white flex items-center justify-center">
-                    <span className="text-xs font-medium">+{members.length - 5}</span>
+                    <span className="text-xs font-medium">
+                      +{members.length - 5}
+                    </span>
                   </div>
                 )}
               </div>
               <span className="text-sm text-muted-foreground">
-                {members.length} member{members.length !== 1 ? 's' : ''}
+                {members.length} member{members.length !== 1 ? "s" : ""}
               </span>
             </div>
           </div>

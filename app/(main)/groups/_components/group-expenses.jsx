@@ -56,7 +56,9 @@ export function GroupExpenses({ expenses }) {
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-lg font-bold">{formatCurrency(expense.amount)}</p>
+                <p className="text-lg font-bold">
+                  {formatCurrency(expense.amount)}
+                </p>
                 <p className="text-sm text-muted-foreground">
                   {expense.splitType.toLowerCase()} split
                 </p>
@@ -71,11 +73,18 @@ export function GroupExpenses({ expenses }) {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {expense.shares.map((share) => (
-                  <div key={share.id} className="flex items-center gap-2 text-sm">
+                  <div
+                    key={share.id}
+                    className="flex items-center gap-2 text-sm"
+                  >
                     <Avatar className="h-6 w-6">
-                      <AvatarImage src={share.user.imageUrl} alt={share.user.name} />
+                      <AvatarImage
+                        src={share.user.imageUrl}
+                        alt={share.user.name}
+                      />
                       <AvatarFallback className="text-xs">
-                        {share.user.name?.charAt(0) || share.user.email?.charAt(0)}
+                        {share.user.name?.charAt(0) ||
+                          share.user.email?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <span className="text-muted-foreground">

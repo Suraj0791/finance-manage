@@ -54,17 +54,17 @@ export async function createGroupExpense(data) {
 
     if (data.splitType === "EQUAL") {
       const shareAmount = totalAmount / groupMembers.length;
-      shares = groupMembers.map(member => ({
+      shares = groupMembers.map((member) => ({
         userId: member.userId,
         amount: shareAmount,
       }));
     } else if (data.splitType === "EXACT" && data.shares) {
-      shares = data.shares.map(share => ({
+      shares = data.shares.map((share) => ({
         userId: share.userId,
         amount: parseFloat(share.amount),
       }));
     } else if (data.splitType === "PERCENTAGE" && data.shares) {
-      shares = data.shares.map(share => ({
+      shares = data.shares.map((share) => ({
         userId: share.userId,
         amount: (totalAmount * parseFloat(share.percentage)) / 100,
       }));
@@ -94,7 +94,7 @@ export async function createGroupExpense(data) {
 
       // Create expense shares
       await tx.expenseShare.createMany({
-        data: shares.map(share => ({
+        data: shares.map((share) => ({
           expenseId: newExpense.id,
           userId: share.userId,
           amount: share.amount,
@@ -168,7 +168,7 @@ export async function getGroupExpenses(groupId) {
     });
 
     // Serialize decimal fields
-    const serializedExpenses = expenses.map(expense => ({
+    const serializedExpenses = expenses.map((expense) => ({
       ...serializeDecimal(expense),
       shares: expense.shares.map(serializeDecimal),
     }));
@@ -233,7 +233,7 @@ export async function calculateGroupBalances(groupId) {
     });
 
     // Initialize balances
-    members.forEach(member => {
+    members.forEach((member) => {
       balances[member.userId] = {
         user: member.user,
         totalPaid: 0,
@@ -243,17 +243,17 @@ export async function calculateGroupBalances(groupId) {
     });
 
     // Calculate from expenses
-    expenses.forEach(expense => {
+    expenses.forEach((expense) => {
       const paidByUserId = expense.paidByUserId;
       const expenseAmount = expense.amount.toNumber();
-      
+
       // Add to payer's total paid
       if (balances[paidByUserId]) {
         balances[paidByUserId].totalPaid += expenseAmount;
       }
 
       // Add to each member's total owed
-      expense.shares.forEach(share => {
+      expense.shares.forEach((share) => {
         const shareAmount = share.amount.toNumber();
         if (balances[share.userId]) {
           balances[share.userId].totalOwed += shareAmount;
@@ -262,8 +262,9 @@ export async function calculateGroupBalances(groupId) {
     });
 
     // Calculate net balances
-    Object.keys(balances).forEach(userId => {
-      balances[userId].netBalance = balances[userId].totalPaid - balances[userId].totalOwed;
+    Object.keys(balances).forEach((userId) => {
+      balances[userId].netBalance =
+        balances[userId].totalPaid - balances[userId].totalOwed;
     });
 
     return Object.values(balances);
@@ -273,7 +274,12 @@ export async function calculateGroupBalances(groupId) {
 }
 
 // Settle up between users
-export async function createSettlement(fromUserId, toUserId, amount, description = '') {
+export async function createSettlement(
+  fromUserId,
+  toUserId,
+  amount,
+  description = ""
+) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
@@ -341,7 +347,9 @@ export async function markSettlementCompleted(settlementId) {
     }
 
     if (settlement.toUserId !== user.id) {
-      throw new Error("You can only mark settlements paid that are owed to you");
+      throw new Error(
+        "You can only mark settlements paid that are owed to you"
+      );
     }
 
     const updatedSettlement = await db.settlement.update({
@@ -383,10 +391,7 @@ export async function getUserSettlements() {
 
     const settlements = await db.settlement.findMany({
       where: {
-        OR: [
-          { fromUserId: user.id },
-          { toUserId: user.id },
-        ],
+        OR: [{ fromUserId: user.id }, { toUserId: user.id }],
       },
       include: {
         fromUser: {

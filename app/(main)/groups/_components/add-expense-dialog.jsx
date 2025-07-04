@@ -46,7 +46,7 @@ const formSchema = z.object({
 
 export function AddExpenseDialog({ groupId, members }) {
   const [open, setOpen] = useState(false);
-  
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,7 +54,7 @@ export function AddExpenseDialog({ groupId, members }) {
       amount: "",
       category: "",
       description: "",
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split("T")[0],
       splitType: "EQUAL",
     },
   });
@@ -72,7 +72,7 @@ export function AddExpenseDialog({ groupId, members }) {
         groupId,
         amount: parseFloat(data.amount),
       };
-      
+
       await createExpenseFn(expenseData);
       if (createdExpense?.success) {
         toast.success("Expense added successfully!");
@@ -84,7 +84,9 @@ export function AddExpenseDialog({ groupId, members }) {
     }
   };
 
-  const expenseCategories = defaultCategories.filter(cat => cat.type === "EXPENSE");
+  const expenseCategories = defaultCategories.filter(
+    (cat) => cat.type === "EXPENSE"
+  );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -110,13 +112,16 @@ export function AddExpenseDialog({ groupId, members }) {
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Dinner at Restaurant" {...field} />
+                    <Input
+                      placeholder="e.g., Dinner at Restaurant"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
+
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -125,18 +130,18 @@ export function AddExpenseDialog({ groupId, members }) {
                   <FormItem>
                     <FormLabel>Amount</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01" 
-                        placeholder="0.00" 
-                        {...field} 
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="date"
@@ -158,7 +163,10 @@ export function AddExpenseDialog({ groupId, members }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a category" />
@@ -183,7 +191,10 @@ export function AddExpenseDialog({ groupId, members }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Split Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -207,7 +218,7 @@ export function AddExpenseDialog({ groupId, members }) {
                 <FormItem>
                   <FormLabel>Description (Optional)</FormLabel>
                   <FormControl>
-                    <Textarea 
+                    <Textarea
                       placeholder="Add any additional details..."
                       {...field}
                     />
@@ -226,7 +237,9 @@ export function AddExpenseDialog({ groupId, members }) {
                 Cancel
               </Button>
               <Button type="submit" disabled={createLoading}>
-                {createLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {createLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Add Expense
               </Button>
             </div>

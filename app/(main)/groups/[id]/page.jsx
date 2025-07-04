@@ -10,7 +10,7 @@ import { notFound } from "next/navigation";
 
 export default async function GroupPage({ params }) {
   const { id } = await params;
-  
+
   try {
     const [groupDetails, balances, expenses] = await Promise.all([
       getGroupDetails(id),
@@ -22,7 +22,10 @@ export default async function GroupPage({ params }) {
       notFound();
     }
 
-    const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const totalExpenses = expenses.reduce(
+      (sum, expense) => sum + expense.amount,
+      0
+    );
 
     return (
       <div className="space-y-6">
@@ -33,21 +36,27 @@ export default async function GroupPage({ params }) {
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Expenses
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalExpenses.toFixed(2)}</div>
+              <div className="text-2xl font-bold">
+                ${totalExpenses.toFixed(2)}
+              </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Members</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{groupDetails.members.length}</div>
+              <div className="text-2xl font-bold">
+                {groupDetails.members.length}
+              </div>
             </CardContent>
           </Card>
 
@@ -63,12 +72,17 @@ export default async function GroupPage({ params }) {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg per Person</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Avg per Person
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                ${groupDetails.members.length > 0 ? (totalExpenses / groupDetails.members.length).toFixed(2) : '0.00'}
+                $
+                {groupDetails.members.length > 0
+                  ? (totalExpenses / groupDetails.members.length).toFixed(2)
+                  : "0.00"}
               </div>
             </CardContent>
           </Card>
@@ -88,7 +102,7 @@ export default async function GroupPage({ params }) {
       </div>
     );
   } catch (error) {
-    console.error('Error loading group:', error);
+    console.error("Error loading group:", error);
     notFound();
   }
 }
