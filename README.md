@@ -1,66 +1,246 @@
-# AI Finance App
+# AI Finance Management App
 
-This AI Finance app provides users with a smart way to manage their finances. It features an interactive dashboard, transaction analysis, receipt scanning, budgeting tools, AI insights, and more. The app integrates several advanced technologies to offer a seamless experience for personal financial management.
+A comprehensive financial management application built with Next.js, Supabase PostgreSQL, Clerk authentication, and Prisma ORM. The application includes personal finance tracking, budgeting tools, transaction analysis, and database health monitoring for Supabase free tier.
 
-#LIVE LINK :
+## Live Application
+
 https://ai-finance-manage.vercel.app/
 
-## Features
+## Recent Updates (September 2025)
 
-- **Dashboard**: Visualize transactions and financial data using bar graphs and pie charts.
-- **Receipt Scanning**: Scan receipts using the AI Gemini API to automatically generate new transactions.
-- **Recurring Transactions**: Option to set up recurring transactions.
-- **Cron Jobs**: For transaction ingestion and data updates.
-- **Monthly Budgeting**: Set and track monthly budgets with email notifications.
-- **AI Insights**: Get AI-generated insights into your spending and budgeting patterns.
+- Enhanced database connection handling for Supabase free tier
+- Added robust error boundaries and recovery mechanisms
+- Implemented database health monitoring system
+- Improved client-side error handling
+
+## � Features
+
+### 💳 Personal Finance Management
+
+- **Interactive Dashboard**: Visualize transactions and financial data using bar graphs and pie charts
+- **AI Receipt Scanning**: Scan receipts using the AI Gemini API to automatically generate new transactions
+- **Multiple Account Support**: Manage multiple bank accounts and credit cards in one place
+- **Transaction Analysis**: Comprehensive categorized transaction tracking and analysis
+- **Smart Budgeting**: Set monthly budgets with email notifications when limits are approached
+- **AI Financial Insights**: Get AI-generated insights into spending patterns and budgeting recommendations
+- **Recurring Transactions**: Set up automatic recurring transactions with background processing
+- **Transaction Categories**: Organize expenses and income with smart categorization
+
+### 👥 Splitwise Clone Features
+
+- **Group Management**: Create and manage expense-sharing groups with friends and family
+- **Email Invitations**: Secure invitation system to add new members via email
+- **Flexible Expense Splitting**:
+  - Equal splits among all members
+  - Exact amount splits with custom values
+  - Percentage-based distributions
+  - Share-based splitting
+- **Real-time Balance Calculations**: Automatic calculation of who owes what to whom
+- **Settlement Tracking**: Record and track payments between group members
+- **Group Categories**: Organize expenses by type (dining, travel, utilities, entertainment, etc.)
+- **Member Role Management**: Admin and member permissions with different access levels
+- **Group Analytics**: Visual insights into group spending patterns and member contributions
+
+### 🔐 Authentication & Security
+
+- **Clerk Integration**: Secure authentication with multiple sign-in providers
+- **Protected Routes**: Middleware-based route protection for secure access
+- **User Profile Management**: Complete user profile and account management
+- **Email Verification**: Secure account verification and password reset
+
+### 🤖 AI & Automation
+
+- **Receipt OCR**: AI-powered receipt text extraction and transaction creation
+- **Smart Categorization**: Automatic expense categorization using AI
+- **Background Jobs**: Cron jobs for transaction processing using Inngest
+- **Email Automation**: Automated budget alerts and group notifications using Resend
+- **Database Health Monitoring**: Automatic Supabase free tier database wake-up functionality
+
+### 🎨 User Experience
+
+- **Responsive Design**: Mobile-first design optimized for all devices
+- **Modern UI**: Clean interface built with ShadCN and Tailwind CSS
+- **Real-time Updates**: Live data synchronization across all components
+- **Error Handling**: Comprehensive error boundaries and user-friendly error messages
+- **Database Status Monitoring**: Real-time connection status with automatic recovery
 - **Email Notifications**: Send budget-related emails using the Resend service and React Email.
 - **Rate Limiting**: Implemented using ArcJet for better API rate management.
 - **Authentication**: User authentication and middleware with Clerk for secure access.
-- **Multiple Accounts**: Support for managing multiple accounts and transactions.
-- **Transaction Analysis**: Comprehensive analysis of user transactions, categorized for easy tracking.
 - **Input Validation**: Zod and HookResolver are used for rigorous input validation to ensure data integrity.
-  
-## Technologies Used
+- **Database Resilience**: Automatic handling of Supabase free tier database pausing with wake-up functionality
 
-- **Next.js**: React framework for building the user interface and handling server-side rendering.
-- **AI Gemini API**: For receipt scanning and AI-powered transaction creation.
-- **Clerk**: Authentication and middleware management.
-- **Prisma**: ORM for interacting with the database.
-- **Supabase**: PostgreSQL database and authentication service.
-- **ShadCN**: UI components for building clean, modern interfaces.
-- **Zod**: Input validation schema for ensuring data correctness.
-- **HookResolver**: Used in combination with Zod for resolving validation and form handling.
-- **ArcJet**: Rate limiting to prevent excessive API calls.
+## 🛠️ Technologies Used
 
-## Installation
+### Frontend
 
-To set up this project locally, follow the steps below:
+- **Next.js 15**: React framework with App Router and Server Components
+- **React 19**: Latest React with concurrent features and modern hooks
+- **Tailwind CSS**: Utility-first CSS framework for responsive design
+- **ShadCN/UI**: High-quality, accessible React components
+- **Radix UI**: Unstyled, accessible UI primitives
+- **Lucide React**: Beautiful, customizable icon library
+- **React Hook Form**: Performant forms with easy validation
+- **Sonner**: Elegant toast notifications
 
-1. Clone the repository:
+### Backend & Database
 
-    ```bash
-    git clone https://github.com/yourusername/ai-finance-app.git
-    cd ai-finance-app
-    ```
+- **Prisma**: Type-safe database ORM with automatic migrations
+- **Supabase**: PostgreSQL database with real-time subscriptions
+- **Enhanced Connection Handling**: Custom retry logic for Supabase free tier
+- **Database Health Monitoring**: Automatic wake-up and status tracking
 
-2. Install dependencies:
+### Authentication & Security
 
-    ```bash
-    npm install --legacy-peer-deps 
-    //as new version of next is having some issues in npm i
-    ```
+- **Clerk**: Complete authentication solution with social providers
+- **Middleware Protection**: Route-level security and user management
+- **Zod Validation**: Runtime type checking and form validation
+- **Input Sanitization**: Comprehensive data validation and security
 
-3. Set up environment variables:
+### AI & External Services
 
-    Create a `.env.local` file in the root directory and add the following environment variables:
+- **Google Gemini AI**: Advanced receipt scanning and text extraction
+- **Resend**: Reliable email delivery service
+- **React Email**: Beautiful, responsive email templates
+- **Inngest**: Background job processing and cron scheduling
 
-    
+### Development & Deployment
+
+- **TypeScript Support**: Enhanced with JSDoc for better development experience
+- **ESLint**: Code quality and consistency enforcement
+- **GitHub Actions**: Automated database health checks and deployments
+- **Vercel**: Optimized deployment platform with edge functions
+
+## 📋 Installation & Setup
+
+### Prerequisites
+
+- Node.js 18+ installed on your machine
+- A Supabase account and project
+- A Clerk account for authentication
+- Google AI API key for receipt scanning
+- Resend account for email notifications
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/finance-manage.git
+cd finance-manage
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```env
+# Database
+DATABASE_URL="your_supabase_connection_string"
+
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your_clerk_publishable_key"
+CLERK_SECRET_KEY="your_clerk_secret_key"
+NEXT_PUBLIC_CLERK_SIGN_IN_URL="/sign-in"
+NEXT_PUBLIC_CLERK_SIGN_UP_URL="/sign-up"
+
+# Google AI for Receipt Scanning
+GEMINI_API_KEY="your_google_ai_api_key"
+
+# Email Service
+RESEND_API_KEY="your_resend_api_key"
+
+# Inngest (for background jobs)
+INNGEST_EVENT_KEY="your_inngest_event_key"
+INNGEST_SIGNING_KEY="your_inngest_signing_key"
+
+# Application URL (for production)
+APP_URL="http://localhost:3000"
+```
+
+### 4. Database Setup
+
+```bash
+# Generate Prisma client
+npx prisma generate
+
+# Run database migrations
+npx prisma migrate dev
+
+# (Optional) Seed the database
+npm run seed
+```
+
+### 5. Run the Development Server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+### 6. Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+## 🔧 Configuration
+
+### Supabase Setup
+
+1. Create a new Supabase project
+2. Copy the connection string from Settings > Database
+3. Enable Row Level Security (RLS) for enhanced security
+4. The app includes automatic database wake-up for free tier limitations
+
+### Clerk Setup
+
+1. Create a Clerk application
+2. Configure sign-in/sign-up pages
+3. Add social providers if desired
+4. Copy the API keys to your environment variables
+
+### Google AI Setup
+
+1. Get an API key from Google AI Studio
+2. Enable the Gemini API for your project
+3. Add the API key to your environment variables
+
+### Email Setup
+
+1. Create a Resend account
+2. Verify your sending domain
+3. Copy the API key to your environment variables
+
+4. Clone the repository:
+
+   ```bash
+   git clone https://github.com/yourusername/ai-finance-app.git
+   cd ai-finance-app
+   ```
+
+5. Install dependencies:
+
+   ```bash
+   npm install --legacy-peer-deps
+   //as new version of next is having some issues in npm i
+   ```
+
+6. Set up environment variables:
+
+   Create a `.env.local` file in the root directory and add the following environment variables:
+
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=sign-in 
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=sign-up
 DATABASE_URL=""
-DIRECT_URL=""        
+DIRECT_URL=""  
 ARCJET_KEY=
 RESEND_API_KEY=
 
@@ -68,25 +248,243 @@ GEMINI_API_KEY=
 
 4. Run the application locally:
 
-    ```bash
-    npm run dev
-    ```
+   ```bash
+   npm run dev
+   ```
 
 5. Open the app in your browser at [http://localhost:3000](http://localhost:3000).
 
-## Deployment
+## 🗄️ Database Management & Supabase Free Tier
 
-To deploy this app on Vercel, follow these steps:
+### Handling Database Pausing
 
-1. Create a Vercel account and link your GitHub repository.
-2. Set the environment variables in Vercel as per the `.env.local` configuration.
-3. Deploy the application and access it using the provided Vercel URL.
+This application includes robust handling for Supabase free tier database pausing:
 
-## Database Schema
+- **Automatic Detection**: The app detects when the database is paused due to 7 days of inactivity
+- **Wake-Up Functionality**: Built-in database wake-up feature with progress tracking
+- **Connection Retry Logic**: Automatic retry with exponential backoff for failed connections
+- **User-Friendly Errors**: Clear error messages explaining the free tier limitations
+- **Health Monitoring**: Real-time database status monitoring on the dashboard
 
-The app uses Prisma for database management. Below is the Prisma schema for the database:
+### Why Database Pausing Happens
 
+- Supabase free tier automatically pauses databases after 7 days of inactivity
+- This is a cost-saving and resource management measure
+- Your data is safe and the database will resume when accessed
+- Common error: Prisma P1001 "Can't reach database server"
 
+### Preventing Database Pausing
+
+1. **GitHub Actions Workflow**: Included workflow pings the database every 6 days
+2. **Health Check Endpoints**: `/api/health` and `/api/ping` for monitoring
+3. **Manual Wake-Up**: Users can manually wake up the database through the UI
+
+### Connection String Optimizations
+
+```env
+# Enhanced connection string with timeouts for Supabase free tier
+DATABASE_URL="postgresql://user:pass@host:6543/postgres?pgbouncer=true&connect_timeout=60&pool_timeout=60"
+```
+
+## 🚀 Deployment
+
+### Vercel Deployment (Recommended)
+
+1. **Connect Repository**: Link your GitHub repository to Vercel
+2. **Environment Variables**: Set all environment variables in Vercel dashboard
+3. **Deploy**: Vercel will automatically build and deploy your application
+4. **Update APP_URL**: Set your production URL in environment variables
+5. **GitHub Actions**: The included workflow will keep your database active
+
+### Manual Deployment Steps
+
+```bash
+# Build the application
+npm run build
+
+# Start the production server
+npm start
+```
+
+### Post-Deployment Setup
+
+1. Update `APP_URL` environment variable with your deployed URL
+2. Add the deployed URL to GitHub Secrets as `APP_URL` for database ping workflow
+3. Verify all environment variables are correctly set
+4. Test the database wake-up functionality
+
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+#### Database Connection Issues
+
+**Problem**: `Prisma P1001: Can't reach database server`
+**Solution**:
+
+- This typically happens when Supabase free tier database is paused
+- Use the built-in database wake-up feature in the app
+- Wait 1-2 minutes for the database to fully wake up
+- The app includes automatic retry logic
+
+#### Receipt Scanning Not Working
+
+**Problem**: Receipt scanning fails or returns empty results
+**Solution**:
+
+- Verify your `GEMINI_API_KEY` is correct
+- Ensure the image is clear and well-lit
+- Check that the receipt text is clearly visible
+- Try uploading a different image format (JPG, PNG)
+
+#### Email Notifications Not Sending
+
+**Problem**: Budget alerts or group invitations not sending
+**Solution**:
+
+- Verify your `RESEND_API_KEY` is valid
+- Check that your domain is verified in Resend
+- Ensure email templates are properly configured
+- Check Resend dashboard for delivery status
+
+#### Authentication Issues
+
+**Problem**: Sign-in/sign-up not working
+**Solution**:
+
+- Verify Clerk API keys are correct
+- Check that redirect URLs match your environment
+- Ensure Clerk webhook endpoints are properly configured
+- Clear browser cache and cookies
+
+### Database Management
+
+#### Preventing Database Pausing
+
+- The included GitHub Actions workflow pings the database every 6 days
+- Manual health checks are available at `/api/health`
+- Database status is monitored in real-time on the dashboard
+
+#### Backup and Recovery
+
+```bash
+# Create a database backup (PostgreSQL)
+pg_dump $DATABASE_URL > backup.sql
+
+# Restore from backup
+psql $DATABASE_URL < backup.sql
+```
+
+### Performance Optimization
+
+#### Database Performance
+
+- Connection pooling is enabled by default
+- Retry logic handles temporary connection issues
+- Database queries are optimized with proper indexing
+
+#### Client-Side Performance
+
+- Server components reduce client-side JavaScript
+- Images are optimized with Next.js Image component
+- Components are lazy-loaded where appropriate
+
+## 📚 API Documentation
+
+### Health Check Endpoints
+
+- `GET /api/health` - Check database connection status
+- `POST /api/ping` - Wake up paused database
+
+### Webhook Endpoints
+
+- `POST /api/webhooks/clerk` - Clerk user management webhooks
+- `POST /api/inngest` - Background job processing
+
+### Internal APIs
+
+- Transaction management endpoints
+- Group and expense management APIs
+- Budget tracking and alerts
+- Settlement calculations
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Guidelines
+
+- Follow the existing code style and conventions
+- Add tests for new features
+- Update documentation as needed
+- Ensure all existing tests pass
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Next.js](https://nextjs.org/) for the amazing React framework
+- [Clerk](https://clerk.dev/) for seamless authentication
+- [Supabase](https://supabase.com/) for the excellent database platform
+- [ShadCN/UI](https://ui.shadcn.com/) for beautiful UI components
+- [Splitwise](https://splitwise.com/) for inspiration on expense sharing features
+
+## 📞 Support
+
+If you encounter any issues or have questions:
+
+1. Check the troubleshooting section above
+2. Search existing GitHub issues
+3. Create a new issue with detailed information
+4. Include error messages and steps to reproduce
+
+---
+
+**Built with ❤️ using Next.js, React, and modern web technologies**
+
+## 📊 Database Schema
+
+The app uses Prisma for database management with comprehensive schemas for both personal finance and group expense features:
+
+### Core Models
+
+- **User**: Clerk-based user management with group relationships
+- **Account**: Multiple financial accounts per user
+- **Transaction**: Personal transactions with AI receipt scanning
+- **Budget**: Monthly budgeting with alerts
+
+### Splitwise Clone Models
+
+- **Group**: Expense-sharing groups with member management
+- **GroupMember**: User membership in groups with roles
+- **GroupExpense**: Shared expenses with multiple split types
+- **ExpenseShare**: Individual shares of group expenses
+- **Settlement**: Payment tracking between users
+- **GroupInvitation**: Email-based group invitations
+
+## 🔧 API Endpoints
+
+### Personal Finance
+
+- `GET /api/health` - Database health check
+- `POST /api/ping` - Database wake-up ping
+- `/dashboard` - Main dashboard with account overview
+- `/transaction/create` - Add new transactions
+- `/account/[id]` - Account details and transactions
+
+### Splitwise Clone
+
+- `/groups` - Group management dashboard
+- `/groups/[id]` - Individual group details
+- `/groups/[id]/expenses` - Group expense management
+- `/groups/[id]/balances` - Group balance calculations
+- `/groups/[id]/settle` - Settlement between members
 
 ## Badges
 
@@ -95,4 +493,3 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
 [![AGPL License](https://img.shields.io/badge/license-AGPL-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)
-

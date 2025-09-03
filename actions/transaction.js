@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
+import { withDbConnection, handleDatabaseError } from "@/lib/db-wrapper";
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -13,90 +14,95 @@ const serializeAmount = (obj) => ({
 });
 
 // Create Transaction
-export async function createTransaction(data,req) {
+export async function createTransaction(data, req) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    // Get request data for ArcJet
-    
+    return await withDbConnection(async (db) => {
+      const user = await db.user.findUnique({
+        where: { clerkUserId: userId },
+      });
 
-    // Check rate limit
-    
+      if (!user) {
+        throw new Error("User not found");
+      }
 
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
-    });
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const account = await db.account.findUnique({
-      where: {
-        id: data.accountId,
-        userId: user.id,
-      },
-    });
-
-    if (!account) {
-      throw new Error("Account not found");
-    }
-
-    // Calculate new balance
-    const balanceChange = data.type === "EXPENSE" ? -data.amount : data.amount;
-    const newBalance = account.balance.toNumber() + balanceChange;
-
-    // Create transaction and update account balance
-    const transaction = await db.$transaction(async (tx) => {
-      const newTransaction = await tx.transaction.create({
-        data: {
-          ...data,
+      const account = await db.account.findUnique({
+        where: {
+          id: data.accountId,
           userId: user.id,
-          nextRecurringDate:
-            data.isRecurring && data.recurringInterval
-              ? calculateNextRecurringDate(data.date, data.recurringInterval)
-              : null,
         },
       });
 
-      await tx.account.update({
-        where: { id: data.accountId },
-        data: { balance: newBalance },
+      if (!account) {
+        throw new Error("Account not found");
+      }
+
+      // Calculate new balance
+      const balanceChange =
+        data.type === "EXPENSE" ? -data.amount : data.amount;
+      const newBalance = account.balance.toNumber() + balanceChange;
+
+      // Create transaction and update account balance
+      const transaction = await db.$transaction(async (tx) => {
+        const newTransaction = await tx.transaction.create({
+          data: {
+            ...data,
+            userId: user.id,
+            nextRecurringDate:
+              data.isRecurring && data.recurringInterval
+                ? calculateNextRecurringDate(data.date, data.recurringInterval)
+                : null,
+          },
+        });
+
+        await tx.account.update({
+          where: { id: data.accountId },
+          data: { balance: newBalance },
+        });
+
+        return newTransaction;
       });
 
-      return newTransaction;
+      revalidatePath("/dashboard");
+      revalidatePath(`/account/${transaction.accountId}`);
+
+      return { success: true, data: serializeAmount(transaction) };
     });
-
-    revalidatePath("/dashboard");
-    revalidatePath(`/account/${transaction.accountId}`);
-
-    return { success: true, data: serializeAmount(transaction) };
   } catch (error) {
-    throw new Error(error.message);
+    const dbError = handleDatabaseError(error);
+    throw new Error(dbError.message);
   }
 }
 
 export async function getTransaction(id) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
+    return await withDbConnection(async (db) => {
+      const user = await db.user.findUnique({
+        where: { clerkUserId: userId },
+      });
 
-  if (!user) throw new Error("User not found");
+      if (!user) throw new Error("User not found");
 
-  const transaction = await db.transaction.findUnique({
-    where: {
-      id,
-      userId: user.id,
-    },
-  });
+      const transaction = await db.transaction.findUnique({
+        where: {
+          id,
+          userId: user.id,
+        },
+      });
 
-  if (!transaction) throw new Error("Transaction not found");
+      if (!transaction) throw new Error("Transaction not found");
 
-  return serializeAmount(transaction);
+      return serializeAmount(transaction);
+    });
+  } catch (error) {
+    const dbError = handleDatabaseError(error);
+    throw new Error(dbError.message);
+  }
 }
 
 export async function updateTransaction(id, data) {

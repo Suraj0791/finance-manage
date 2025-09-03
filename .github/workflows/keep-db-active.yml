@@ -1,0 +1,37 @@
+name: Keep Supabase Database Active
+
+on:
+  schedule:
+    # Run every 6 days (before the 7-day inactivity limit)
+    - cron: "0 12 */6 * *" # Every 6 days at noon UTC
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  ping-database:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping Database
+        run: |
+          # Ping your deployed application's health endpoint
+          curl -f ${{ secrets.APP_URL }}/api/ping || echo "Ping failed, but that's expected if database is sleeping"
+
+          # Wait a bit for the database to wake up
+          sleep 30
+
+          # Try the health check endpoint
+          curl -f ${{ secrets.APP_URL }}/api/health || echo "Health check completed"
+
+          echo "Database ping completed at $(date)"
+
+  # Optional: Send notification on failure
+  notify-on-failure:
+    needs: ping-database
+    if: failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify on Failure
+        run: |
+          echo "Database ping failed. Manual intervention may be required."
+          # You can add Slack/Discord/Email notifications here if needed
