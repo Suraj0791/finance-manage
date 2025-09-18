@@ -414,3 +414,144 @@ export async function getUserInvitations() {
     throw new Error(error.message);
   }
 }
+
+// Calculate group balances and settlements
+export async function calculateGroupBalances(groupId) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if user is member of the group
+    const membership = await db.groupMember.findFirst({
+      where: {
+        groupId,
+        userId: user.id,
+      },
+    });
+
+    if (!membership) {
+      throw new Error("You are not a member of this group");
+    }
+
+    // Get all expenses and their shares for this group
+    const expenses = await db.groupExpense.findMany({
+      where: { groupId },
+      include: {
+        paidBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        shares: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Calculate balances for each user
+    const balances = {};
+    const userMap = {};
+
+    // Initialize balances and user map
+    expenses.forEach((expense) => {
+      // Add payer to userMap
+      if (!userMap[expense.paidBy.id]) {
+        userMap[expense.paidBy.id] = expense.paidBy;
+        balances[expense.paidBy.id] = 0;
+      }
+
+      // Add all participants to userMap
+      expense.shares.forEach((share) => {
+        if (!userMap[share.user.id]) {
+          userMap[share.user.id] = share.user;
+          balances[share.user.id] = 0;
+        }
+      });
+    });
+
+    // Calculate what each person paid vs what they owe
+    expenses.forEach((expense) => {
+      const totalAmount = expense.amount.toNumber();
+      const paidById = expense.paidBy.id;
+
+      // Person who paid gets credited
+      balances[paidById] += totalAmount;
+
+      // Each person who has a share gets debited
+      expense.shares.forEach((share) => {
+        const shareAmount = share.amount.toNumber();
+        balances[share.user.id] -= shareAmount;
+      });
+    });
+
+    // Convert to array format with user details
+    const balancesList = Object.entries(balances).map(([userId, balance]) => ({
+      user: userMap[userId],
+      balance: Number(balance.toFixed(2)),
+      netBalance: Number(balance.toFixed(2)),
+      owes: balance < 0 ? Math.abs(balance) : 0,
+      owed: balance > 0 ? balance : 0,
+    }));
+
+    // Calculate suggested settlements (simplified)
+    const settlements = [];
+    const debtors = balancesList
+      .filter((b) => b.balance < 0)
+      .sort((a, b) => a.balance - b.balance);
+    const creditors = balancesList
+      .filter((b) => b.balance > 0)
+      .sort((a, b) => b.balance - a.balance);
+
+    let i = 0,
+      j = 0;
+    while (i < debtors.length && j < creditors.length) {
+      const debtor = debtors[i];
+      const creditor = creditors[j];
+      const amount = Math.min(Math.abs(debtor.balance), creditor.balance);
+
+      if (amount > 0.01) {
+        // Avoid tiny settlements
+        settlements.push({
+          from: debtor.user,
+          to: creditor.user,
+          amount: Number(amount.toFixed(2)),
+        });
+      }
+
+      debtor.balance += amount;
+      creditor.balance -= amount;
+
+      if (Math.abs(debtor.balance) < 0.01) i++;
+      if (Math.abs(creditor.balance) < 0.01) j++;
+    }
+
+    return {
+      balances: balancesList,
+      settlements,
+      totalExpenses: expenses.reduce(
+        (sum, exp) => sum + exp.amount.toNumber(),
+        0
+      ),
+    };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}

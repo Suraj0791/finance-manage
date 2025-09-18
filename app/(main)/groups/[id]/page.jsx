@@ -89,7 +89,7 @@ export default async function GroupPage({ params }) {
         </div>
 
         {/* Group Balances */}
-        <GroupBalances balances={balances} />
+        <GroupBalances balances={balances.balances || []} />
 
         {/* Group Expenses */}
         <div className="space-y-4">

@@ -1,0 +1,50 @@
+name: Keep Supabase Awake
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # daily at 03:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    name: Daily ping /api/dbcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read APP_URL from secrets
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+        run: |
+          if [ -z "$APP_URL" ]; then
+            echo "::error::APP_URL secret not set. Define repository Secret APP_URL with your deployed site URL (e.g., https://your-app.vercel.app)";
+            exit 1
+          fi
+          echo "Using APP_URL=$APP_URL"
+      - name: Resolve APP_URL
+        id: resolve
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+        run: |
+          echo "Pinging: $APP_URL"
+
+      - name: Ping /api/dbcheck with retries
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+        run: |
+          set -e
+          for i in 1 2 3 4 5; do
+            echo "Attempt $i: $APP_URL/api/dbcheck"
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$APP_URL/api/dbcheck") || true
+            echo "HTTP $code"
+            if [ "$code" = "200" ] || [ "$code" = "503" ]; then
+              # 200 means DB is awake, 503 means app responded and DB is waking — both are fine for our purposes
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::warning::Ping did not return 200/503 after retries."
+
+      - name: Ping /api/health (optional)
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+        run: |
+          curl -sS "$APP_URL/api/health" || true

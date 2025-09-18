@@ -59,10 +59,12 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Database Status for Troubleshooting */}
-        <div className="max-w-md mx-auto mt-12">
-          <ApiPingButton />
-        </div>
+        {/* Optional: show DB Ping only when explicitly enabled (e.g., during troubleshooting) */}
+        {process.env.NEXT_PUBLIC_SHOW_DB_PING === "true" && (
+          <div className="max-w-md mx-auto mt-12">
+            <ApiPingButton />
+          </div>
+        )}
       </section>
     </div>
   );
