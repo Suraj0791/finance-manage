@@ -26,8 +26,13 @@ import {
   Play,
   Trash2,
   Crown,
+  Loader2,
 } from "lucide-react";
-import { updateGroupStatus, removeGroupMember } from "@/actions/groups";
+import {
+  updateGroupStatus,
+  removeGroupMember,
+  deleteGroup,
+} from "@/actions/groups";
 import { toast } from "sonner";
 import useFetch from "@/hooks/use-fetch";
 
@@ -46,6 +51,9 @@ export function GroupSettingsDialog({ group, currentUserId, isAdmin }) {
   const { loading: removeMemberLoading, fn: removeMemberFn } =
     useFetch(removeGroupMember);
 
+  const { loading: deleteGroupLoading, fn: deleteGroupFn } =
+    useFetch(deleteGroup);
+
   const handleStatusChange = async (newStatus) => {
     try {
       await updateStatusFn(group.id, newStatus);
@@ -62,6 +70,24 @@ export function GroupSettingsDialog({ group, currentUserId, isAdmin }) {
         toast.success("Member removed successfully");
       } catch (error) {
         toast.error("Failed to remove member");
+      }
+    }
+  };
+
+  const handleDeleteGroup = async () => {
+    if (
+      window.confirm(
+        "Are you sure? This will permanently delete the group and all its data. This action cannot be undone."
+      )
+    ) {
+      try {
+        await deleteGroupFn(group.id);
+        toast.success("Group deleted successfully");
+        setOpen(false);
+        // Redirect to groups page
+        window.location.href = "/groups";
+      } catch (error) {
+        toast.error("Failed to delete group");
       }
     }
   };
@@ -235,18 +261,17 @@ export function GroupSettingsDialog({ group, currentUserId, isAdmin }) {
                 variant="destructive"
                 size="sm"
                 className="w-full"
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      "Are you sure? This will permanently delete the group and all its data."
-                    )
-                  ) {
-                    // TODO: Implement delete group functionality
-                    toast.error("Group deletion not implemented yet");
-                  }
-                }}
+                onClick={handleDeleteGroup}
+                disabled={deleteGroupLoading}
               >
-                Delete Group Permanently
+                {deleteGroupLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete Group Permanently"
+                )}
               </Button>
               <p className="text-xs text-muted-foreground">
                 This action cannot be undone. All expenses and data will be

@@ -203,9 +203,23 @@ export async function getGroupDetails(groupId) {
                 imageUrl: true,
               },
             },
+            paidByAnonymous: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
             shares: {
               include: {
                 user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                  },
+                },
+                anonymousMember: {
                   select: {
                     id: true,
                     name: true,
@@ -482,9 +496,23 @@ export async function calculateGroupBalances(groupId) {
             email: true,
           },
         },
+        paidByAnonymous: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
         shares: {
           include: {
             user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+            anonymousMember: {
               select: {
                 id: true,
                 name: true,
@@ -502,17 +530,19 @@ export async function calculateGroupBalances(groupId) {
 
     // Initialize balances and user map
     expenses.forEach((expense) => {
-      // Add payer to userMap
-      if (!userMap[expense.paidBy.id]) {
-        userMap[expense.paidBy.id] = expense.paidBy;
-        balances[expense.paidBy.id] = 0;
+      // Add payer to userMap (either regular user or anonymous)
+      const payer = expense.paidBy || expense.paidByAnonymous;
+      if (payer && !userMap[payer.id]) {
+        userMap[payer.id] = payer;
+        balances[payer.id] = 0;
       }
 
-      // Add all participants to userMap
+      // Add all participants to userMap (both regular users and anonymous members)
       expense.shares.forEach((share) => {
-        if (!userMap[share.user.id]) {
-          userMap[share.user.id] = share.user;
-          balances[share.user.id] = 0;
+        const participant = share.user || share.anonymousMember;
+        if (participant && !userMap[participant.id]) {
+          userMap[participant.id] = participant;
+          balances[participant.id] = 0;
         }
       });
     });
@@ -520,15 +550,20 @@ export async function calculateGroupBalances(groupId) {
     // Calculate what each person paid vs what they owe
     expenses.forEach((expense) => {
       const totalAmount = expense.amount.toNumber();
-      const paidById = expense.paidBy.id;
+      const payer = expense.paidBy || expense.paidByAnonymous;
 
-      // Person who paid gets credited
-      balances[paidById] += totalAmount;
+      if (payer) {
+        // Person who paid gets credited
+        balances[payer.id] += totalAmount;
+      }
 
       // Each person who has a share gets debited
       expense.shares.forEach((share) => {
         const shareAmount = share.amount.toNumber();
-        balances[share.user.id] -= shareAmount;
+        const participant = share.user || share.anonymousMember;
+        if (participant) {
+          balances[participant.id] -= shareAmount;
+        }
       });
     });
 
@@ -800,6 +835,46 @@ export async function removeGroupMember(
     }
 
     revalidatePath(`/groups/${groupId}`);
+    return { success: true };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+// Delete group permanently
+export async function deleteGroup(groupId) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if user is admin of the group
+    const membership = await db.groupMember.findFirst({
+      where: {
+        groupId,
+        userId: user.id,
+        role: "ADMIN",
+      },
+    });
+
+    if (!membership) {
+      throw new Error("You don't have permission to delete this group");
+    }
+
+    // Delete the group (cascade deletes will handle related data)
+    await db.group.delete({
+      where: { id: groupId },
+    });
+
+    revalidatePath("/groups");
+    revalidateTag("groups");
     return { success: true };
   } catch (error) {
     throw new Error(error.message);

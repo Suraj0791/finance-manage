@@ -20,10 +20,10 @@ export function JoinGroupButton({ groupId, token }) {
 
   const handleJoinGroup = async () => {
     try {
-      await joinGroupFn(groupId, token);
-      if (joinResult?.success) {
+      const result = await joinGroupFn(groupId, token);
+      if (result?.success) {
         setJoined(true);
-        toast.success(`Successfully joined ${joinResult.group.name}!`);
+        toast.success(`Successfully joined ${result.group.name}!`);
         setTimeout(() => {
           router.push(`/groups/${groupId}`);
         }, 1500);

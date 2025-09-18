@@ -70,23 +70,21 @@ export function CreateGroupDialog() {
   };
 
   const onSubmit = async (data) => {
-    // Close dialog immediately for better UX
-    setOpen(false);
-    form.reset();
-
-    // Show optimistic success message
-    toast.success("Creating group...");
-
     try {
+      // Show optimistic success message
+      toast.success("Creating group...");
+
       await createGroupFn(data);
+
+      // Close dialog and reset form after successful creation
+      setOpen(false);
+      form.reset();
+
       // Replace the optimistic message with confirmation
       toast.success("Group created successfully!");
     } catch (error) {
-      // Revert optimistic UI by showing error
+      // Show error and keep dialog open for retry
       toast.error(error.message || "Failed to create group");
-      // Optionally reopen the dialog with the form data
-      // setOpen(true);
-      // form.reset(data);
     }
   };
 

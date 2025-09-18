@@ -86,6 +86,7 @@ export function AddExpenseDialog({ groupId, members, anonymousMembers = [] }) {
 
   const watchedParticipants = form.watch("participants");
   const watchedSplitType = form.watch("splitType");
+  const watchedAmount = form.watch("amount");
 
   const {
     loading: createLoading,
@@ -100,47 +101,52 @@ export function AddExpenseDialog({ groupId, members, anonymousMembers = [] }) {
       amount: parseFloat(data.amount),
     };
 
-    // Close dialog immediately for better UX
-    setOpen(false);
-    form.reset();
-
-    // Show optimistic success message
-    toast.success("Adding expense...");
-
     try {
+      // Show optimistic success message
+      toast.success("Adding expense...");
+
       await createExpenseFn(expenseData);
+
+      // Close dialog and reset form after successful creation
+      setOpen(false);
+      form.reset();
+
       // Replace the optimistic message with confirmation
       toast.success("Expense added successfully!");
     } catch (error) {
-      // Show error and optionally reopen dialog
+      // Show error and keep dialog open for retry
       toast.error(error.message || "Failed to add expense");
-      // Optionally reopen the dialog with the form data
-      // setOpen(true);
-      // form.reset(data);
     }
   };
 
   const toggleParticipant = (memberId) => {
     const current = form.getValues("participants");
-    if (current.includes(memberId)) {
-      form.setValue(
-        "participants",
-        current.filter((id) => id !== memberId)
-      );
-    } else {
-      form.setValue("participants", [...current, memberId]);
-    }
+    const newParticipants = current.includes(memberId)
+      ? current.filter((id) => id !== memberId)
+      : [...current, memberId];
+
+    form.setValue("participants", newParticipants, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
 
   const selectAllParticipants = () => {
     form.setValue(
       "participants",
-      allMembers.map((m) => m.id)
+      allMembers.map((m) => m.id),
+      {
+        shouldValidate: true,
+        shouldDirty: true,
+      }
     );
   };
 
   const clearAllParticipants = () => {
-    form.setValue("participants", []);
+    form.setValue("participants", [], {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
 
   const expenseCategories = defaultCategories.filter(
@@ -366,12 +372,21 @@ export function AddExpenseDialog({ groupId, members, anonymousMembers = [] }) {
                       {allMembers.map((member) => (
                         <div
                           key={member.id}
-                          className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer"
-                          onClick={() => toggleParticipant(member.id)}
+                          className={`flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer transition-all duration-200 ${
+                            watchedParticipants.includes(member.id)
+                              ? "bg-green-50 border border-green-200 shadow-sm"
+                              : "border border-transparent"
+                          }`}
+                          onClick={(e) => {
+                            // Only trigger if not clicking directly on checkbox
+                            if (e.target.type !== "checkbox") {
+                              toggleParticipant(member.id);
+                            }
+                          }}
                         >
                           <Checkbox
                             checked={watchedParticipants.includes(member.id)}
-                            onChange={() => toggleParticipant(member.id)}
+                            onCheckedChange={() => toggleParticipant(member.id)}
                           />
                           <Avatar className="h-8 w-8">
                             <AvatarImage
@@ -384,12 +399,26 @@ export function AddExpenseDialog({ groupId, members, anonymousMembers = [] }) {
                           </Avatar>
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium">
+                              <span
+                                className={`text-sm font-medium ${
+                                  watchedParticipants.includes(member.id)
+                                    ? "text-green-700"
+                                    : ""
+                                }`}
+                              >
                                 {member.name}
                               </span>
                               {member.type === "anonymous" && (
                                 <Badge variant="outline" className="text-xs">
                                   Guest
+                                </Badge>
+                              )}
+                              {watchedParticipants.includes(member.id) && (
+                                <Badge
+                                  variant="secondary"
+                                  className="text-xs bg-green-100 text-green-700"
+                                >
+                                  ✓ Selected
                                 </Badge>
                               )}
                             </div>
@@ -402,9 +431,8 @@ export function AddExpenseDialog({ groupId, members, anonymousMembers = [] }) {
                           {watchedSplitType === "EQUAL" &&
                             watchedParticipants.includes(member.id) && (
                               <Badge variant="secondary" className="text-xs">
-                                {form.watch("amount") &&
-                                watchedParticipants.length > 0
-                                  ? `$${(parseFloat(form.watch("amount")) / watchedParticipants.length).toFixed(2)}`
+                                {watchedAmount && watchedParticipants.length > 0
+                                  ? `$${(parseFloat(watchedAmount) / watchedParticipants.length).toFixed(2)}`
                                   : "$0.00"}
                               </Badge>
                             )}

@@ -50,7 +50,9 @@ export function GroupExpenses({ expenses }) {
                     </div>
                     <div className="flex items-center gap-1">
                       <User className="h-3 w-3" />
-                      Paid by {expense.paidBy.name || expense.paidBy.email}
+                      Paid by {(expense.paidBy?.name || expense.paidBy?.email) || 
+                               (expense.paidByAnonymous?.name || expense.paidByAnonymous?.email) || 
+                               'Unknown'}
                     </div>
                   </div>
                 </div>
@@ -72,34 +74,39 @@ export function GroupExpenses({ expenses }) {
                 <span className="text-sm font-medium">Split between:</span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {expense.shares.map((share) => (
-                  <div
-                    key={share.id}
-                    className="flex items-center gap-2 text-sm"
-                  >
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage
-                        src={share.user.imageUrl}
-                        alt={share.user.name}
-                      />
-                      <AvatarFallback className="text-xs">
-                        {share.user.name?.charAt(0) ||
-                          share.user.email?.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-muted-foreground">
-                      {share.user.name || share.user.email}
-                    </span>
-                    <span className="font-medium">
-                      {formatCurrency(share.amount)}
-                    </span>
-                    {share.isPaid && (
-                      <Badge variant="secondary" className="text-xs">
-                        Paid
-                      </Badge>
-                    )}
-                  </div>
-                ))}
+                {expense.shares.map((share) => {
+                  const participant = share.user || share.anonymousMember;
+                  if (!participant) return null;
+                  
+                  return (
+                    <div
+                      key={share.id}
+                      className="flex items-center gap-2 text-sm"
+                    >
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage
+                          src={participant.imageUrl}
+                          alt={participant.name}
+                        />
+                        <AvatarFallback className="text-xs">
+                          {participant.name?.charAt(0) ||
+                            participant.email?.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-muted-foreground">
+                        {participant.name || participant.email}
+                      </span>
+                      <span className="font-medium">
+                        {formatCurrency(share.amount)}
+                      </span>
+                      {share.isPaid && (
+                        <Badge variant="secondary" className="text-xs">
+                          Paid
+                        </Badge>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </CardContent>

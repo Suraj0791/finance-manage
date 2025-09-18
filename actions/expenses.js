@@ -38,7 +38,7 @@ export async function createGroupExpense(data) {
       throw new Error("You are not a member of this group");
     }
 
-    // Get group members for equal split calculation
+    // Get all group members and anonymous members
     const groupMembers = await db.groupMember.findMany({
       where: { groupId: data.groupId },
       include: {
@@ -48,32 +48,70 @@ export async function createGroupExpense(data) {
       },
     });
 
-    // Calculate shares based on split type
-    let shares = [];
-    const totalAmount = parseFloat(data.amount);
+    const anonymousMembers = await db.anonymousMember.findMany({
+      where: { groupId: data.groupId },
+    });
 
-    if (data.splitType === "EQUAL") {
-      const shareAmount = totalAmount / groupMembers.length;
-      shares = groupMembers.map((member) => ({
-        userId: member.userId,
-        amount: shareAmount,
-      }));
-    } else if (data.splitType === "EXACT" && data.shares) {
-      shares = data.shares.map((share) => ({
-        userId: share.userId,
-        amount: parseFloat(share.amount),
-      }));
-    } else if (data.splitType === "PERCENTAGE" && data.shares) {
-      shares = data.shares.map((share) => ({
-        userId: share.userId,
-        amount: (totalAmount * parseFloat(share.percentage)) / 100,
-      }));
+    // Extract the actual user ID from paidBy (remove prefix if present)
+    const paidByUserId = data.paidBy.startsWith("user_")
+      ? data.paidBy.replace("user_", "")
+      : data.paidBy.startsWith("anon_")
+        ? data.paidBy.replace("anon_", "")
+        : data.paidBy;
+
+    // Validate that paidBy user is a member of the group
+    const allMemberIds = [
+      ...groupMembers.map((m) => m.userId),
+      ...anonymousMembers.map((m) => m.id),
+    ];
+
+    if (!allMemberIds.includes(paidByUserId)) {
+      throw new Error("Invalid payer: user is not a member of this group");
     }
 
-    // Validate shares sum equals total amount
-    const sharesSum = shares.reduce((sum, share) => sum + share.amount, 0);
-    if (Math.abs(sharesSum - totalAmount) > 0.01) {
-      throw new Error("Shares must sum up to the total amount");
+    // Get selected participants and map them to actual user IDs
+    const selectedParticipants = data.participants || [];
+
+    // Process participants to handle both regular users and anonymous members
+    const participantUserIds = [];
+    const participantAnonIds = [];
+
+    selectedParticipants.forEach((participantId) => {
+      if (participantId.startsWith("user_")) {
+        participantUserIds.push(participantId.replace("user_", ""));
+      } else if (participantId.startsWith("anon_")) {
+        participantAnonIds.push(participantId.replace("anon_", ""));
+      } else {
+        // Handle cases where IDs don't have prefixes
+        const isAnonymous = anonymousMembers.some(
+          (anon) => anon.id === participantId
+        );
+        if (isAnonymous) {
+          participantAnonIds.push(participantId);
+        } else {
+          participantUserIds.push(participantId);
+        }
+      }
+    });
+
+    const totalParticipants =
+      participantUserIds.length + participantAnonIds.length;
+
+    if (totalParticipants === 0) {
+      throw new Error("At least one participant must be selected");
+    }
+
+    // Determine if payer is anonymous or regular user
+    const isAnonymousPayer = data.paidBy.startsWith("anon_");
+
+    // Calculate shares based on split type
+    const totalAmount = parseFloat(data.amount);
+    let shareAmount;
+
+    if (data.splitType === "EQUAL") {
+      shareAmount = totalAmount / totalParticipants;
+    } else {
+      throw new Error("Only EQUAL split type is currently supported");
     }
 
     // Create expense and shares in a transaction
@@ -81,7 +119,9 @@ export async function createGroupExpense(data) {
       const newExpense = await tx.groupExpense.create({
         data: {
           groupId: data.groupId,
-          paidByUserId: user.id,
+          ...(isAnonymousPayer
+            ? { paidByAnonymousMemberId: paidByUserId }
+            : { paidByUserId: paidByUserId }),
           title: data.title,
           description: data.description,
           amount: totalAmount,
@@ -93,13 +133,30 @@ export async function createGroupExpense(data) {
       });
 
       // Create expense shares
-      await tx.expenseShare.createMany({
-        data: shares.map((share) => ({
+      const shareData = [];
+
+      // Add shares for regular users
+      participantUserIds.forEach((userId) => {
+        shareData.push({
           expenseId: newExpense.id,
-          userId: share.userId,
-          amount: share.amount,
-          isPaid: share.userId === user.id, // Payer's share is automatically paid
-        })),
+          userId: userId,
+          amount: shareAmount,
+          isPaid: !isAnonymousPayer && userId === paidByUserId, // Payer's share is automatically paid
+        });
+      });
+
+      // Add shares for anonymous members
+      participantAnonIds.forEach((anonId) => {
+        shareData.push({
+          expenseId: newExpense.id,
+          anonymousMemberId: anonId,
+          amount: shareAmount,
+          isPaid: isAnonymousPayer && anonId === paidByUserId, // Payer's share is automatically paid (if anonymous)
+        });
+      });
+
+      await tx.expenseShare.createMany({
+        data: shareData,
       });
 
       return newExpense;
@@ -149,6 +206,13 @@ export async function getGroupExpenses(groupId) {
             imageUrl: true,
           },
         },
+        paidByAnonymous: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
         shares: {
           include: {
             user: {
@@ -157,6 +221,13 @@ export async function getGroupExpenses(groupId) {
                 name: true,
                 email: true,
                 imageUrl: true,
+              },
+            },
+            anonymousMember: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
               },
             },
           },
@@ -347,16 +418,14 @@ export async function markSettlementCompleted(settlementId) {
     }
 
     if (settlement.toUserId !== user.id) {
-      throw new Error(
-        "You can only mark settlements paid that are owed to you"
-      );
+      throw new Error("Only the recipient can mark a settlement as completed");
     }
 
     const updatedSettlement = await db.settlement.update({
       where: { id: settlementId },
       data: {
         status: "COMPLETED",
-        settledAt: new Date(),
+        completedAt: new Date(),
       },
       include: {
         fromUser: {
@@ -370,6 +439,59 @@ export async function markSettlementCompleted(settlementId) {
 
     revalidatePath("/settlements");
     return { success: true, data: serializeDecimal(updatedSettlement) };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+// Create a payment record for settlement suggestion
+export async function recordSettlementPayment(
+  fromUserId,
+  toUserId,
+  amount,
+  groupId
+) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Verify user is involved in this settlement
+    if (user.id !== fromUserId && user.id !== toUserId) {
+      throw new Error("You can only record payments you're involved in");
+    }
+
+    // Create a settlement record
+    const settlement = await db.settlement.create({
+      data: {
+        fromUserId,
+        toUserId,
+        amount: parseFloat(amount),
+        groupId,
+        description: `Settlement payment in group`,
+        status: "COMPLETED",
+        completedAt: new Date(),
+      },
+      include: {
+        fromUser: {
+          select: { id: true, name: true, email: true, imageUrl: true },
+        },
+        toUser: {
+          select: { id: true, name: true, email: true, imageUrl: true },
+        },
+      },
+    });
+
+    // Revalidate the group page
+    revalidatePath(`/groups/${groupId}`);
+    return { success: true, data: serializeDecimal(settlement) };
   } catch (error) {
     throw new Error(error.message);
   }
