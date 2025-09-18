@@ -50,9 +50,12 @@ export function GroupExpenses({ expenses }) {
                     </div>
                     <div className="flex items-center gap-1">
                       <User className="h-3 w-3" />
-                      Paid by {(expense.paidBy?.name || expense.paidBy?.email) || 
-                               (expense.paidByAnonymous?.name || expense.paidByAnonymous?.email) || 
-                               'Unknown'}
+                      Paid by{" "}
+                      {expense.paidBy?.name ||
+                        expense.paidBy?.email ||
+                        expense.paidByAnonymous?.name ||
+                        expense.paidByAnonymous?.email ||
+                        "Unknown"}
                     </div>
                   </div>
                 </div>
@@ -77,7 +80,7 @@ export function GroupExpenses({ expenses }) {
                 {expense.shares.map((share) => {
                   const participant = share.user || share.anonymousMember;
                   if (!participant) return null;
-                  
+
                   return (
                     <div
                       key={share.id}
