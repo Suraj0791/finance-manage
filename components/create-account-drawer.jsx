@@ -63,22 +63,27 @@ export function CreateAccountDrawer({ children }) {
   } = useFetch(createAccount);
 
   const onSubmit = async (data) => {
-    await createAccountFn(data);
+    // Close drawer immediately for better UX
+    setOpen(false);
+    reset();
+    
+    // Show optimistic success message
+    toast.success("Creating account...");
+    
+    try {
+      await createAccountFn(data);
+      // Replace the optimistic message with confirmation
+      toast.success("Account created successfully!");
+    } catch (error) {
+      // Show error and optionally reopen drawer
+      toast.error(error.message || "Failed to create account");
+      // Optionally reopen the drawer with the form data
+      // setOpen(true);
+      // reset(data);
+    }
   };
 
-  useEffect(() => {
-    if (newAccount) {
-      toast.success("Account created successfully");
-      reset();
-      setOpen(false);
-    }
-  }, [newAccount, reset]);
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error.message || "Failed to create account");
-    }
-  }, [error]);
+  // Remove the useEffect handlers since we're handling success/error in onSubmit now
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>

@@ -2,7 +2,7 @@
 import { withDbConnection, handleDatabaseError } from "@/lib/db-wrapper";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 
 const serializeTransaction = (obj) => {
   const serialized = { ...obj };
@@ -15,11 +15,9 @@ const serializeTransaction = (obj) => {
   return serialized;
 };
 
-export async function getUserAccounts() {
-  try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
-
+// Cache user accounts for 30 seconds
+const getCachedUserAccounts = unstable_cache(
+  async (userId) => {
     return await withDbConnection(async (db) => {
       const user = await db.user.findUnique({
         where: { clerkUserId: userId },
@@ -41,9 +39,22 @@ export async function getUserAccounts() {
         },
       });
 
-      // Serialize accounts before sending to client
       return accounts.map(serializeTransaction);
     });
+  },
+  ['user-accounts'],
+  {
+    revalidate: 30, // Cache for 30 seconds
+    tags: ['accounts']
+  }
+);
+
+export async function getUserAccounts() {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    return await getCachedUserAccounts(userId);
   } catch (error) {
     const dbError = handleDatabaseError(error);
     throw new Error(dbError.message);

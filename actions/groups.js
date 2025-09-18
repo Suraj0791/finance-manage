@@ -3,6 +3,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import crypto from "crypto";
 
 const serializeDecimal = (obj) => {
   const serialized = { ...obj };
@@ -38,6 +39,16 @@ export async function createGroup(data) {
             role: "ADMIN",
           },
         },
+        // Create anonymous members if provided
+        ...(data.members &&
+          data.members.length > 0 && {
+            anonymousMembers: {
+              create: data.members.map((member) => ({
+                name: member.name,
+                email: member.email || null,
+              })),
+            },
+          }),
       },
       include: {
         members: {
@@ -52,6 +63,7 @@ export async function createGroup(data) {
             },
           },
         },
+        anonymousMembers: true,
         _count: {
           select: {
             members: true,
@@ -161,6 +173,11 @@ export async function getGroupDetails(groupId) {
                 imageUrl: true,
               },
             },
+          },
+        },
+        anonymousMembers: {
+          where: {
+            isActive: true,
           },
         },
         expenses: {
@@ -551,6 +568,133 @@ export async function calculateGroupBalances(groupId) {
         0
       ),
     };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+// Generate invite link for group
+export async function generateGroupInviteLink(groupId) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if user is admin of the group
+    const membership = await db.groupMember.findFirst({
+      where: {
+        groupId,
+        userId: user.id,
+        role: "ADMIN",
+      },
+    });
+
+    if (!membership) {
+      throw new Error(
+        "You don't have permission to generate invite links for this group"
+      );
+    }
+
+    // Generate a secure token
+    const token = crypto.randomBytes(32).toString("hex");
+
+    // Delete any existing invite link tokens for this group (cleanup)
+    await db.groupInvitation.deleteMany({
+      where: {
+        groupId,
+        email: {
+          startsWith: "invite_link_",
+        },
+        status: "PENDING",
+      },
+    });
+
+    // Create new invite token
+    const inviteToken = await db.groupInvitation.create({
+      data: {
+        groupId,
+        senderUserId: user.id,
+        email: `invite_link_${token}`,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        status: "PENDING",
+      },
+    });
+
+    const inviteUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/invite/${groupId}/${token}`;
+
+    return {
+      success: true,
+      data: { inviteUrl, token, expiresAt: inviteToken.expiresAt },
+    };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+// Join group via invite link
+export async function joinGroupViaInviteLink(groupId, token) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Find the invite token
+    const invitation = await db.groupInvitation.findFirst({
+      where: {
+        groupId,
+        email: `invite_link_${token}`,
+        status: "PENDING",
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+      include: {
+        group: true,
+      },
+    });
+
+    if (!invitation) {
+      throw new Error("Invalid or expired invite link");
+    }
+
+    // Check if user is already a member
+    const existingMember = await db.groupMember.findFirst({
+      where: {
+        groupId,
+        userId: user.id,
+      },
+    });
+
+    if (existingMember) {
+      throw new Error("You are already a member of this group");
+    }
+
+    // Add user to group
+    await db.groupMember.create({
+      data: {
+        groupId,
+        userId: user.id,
+        role: "MEMBER",
+      },
+    });
+
+    revalidatePath("/groups");
+    revalidatePath(`/groups/${groupId}`);
+    return { success: true, group: invitation.group };
   } catch (error) {
     throw new Error(error.message);
   }

@@ -21,13 +21,13 @@ model User {
   transactions Transaction[]
 
   // Splitwise feature relations
-  groupMemberships GroupMember[]
-  createdGroups    Group[]       @relation("GroupCreator")
-  paidExpenses     GroupExpense[] @relation("ExpensePayer")
-  expenseShares    ExpenseShare[]
-  settlementsFrom  Settlement[]  @relation("SettlementFrom")
-  settlementsTo    Settlement[]  @relation("SettlementTo")
-  sentInvitations  GroupInvitation[] @relation("InvitationSender")
+  groupMemberships    GroupMember[]
+  createdGroups       Group[]           @relation("GroupCreator")
+  paidExpenses        GroupExpense[]    @relation("ExpensePayer")
+  expenseShares       ExpenseShare[]
+  settlementsFrom     Settlement[]      @relation("SettlementFrom")
+  settlementsTo       Settlement[]      @relation("SettlementTo")
+  sentInvitations     GroupInvitation[] @relation("InvitationSender")
   receivedInvitations GroupInvitation[] @relation("InvitationReceiver")
 
   @@map("users")
@@ -88,34 +88,52 @@ model Budget {
 }
 
 model Group {
-  id          String        @id @default(uuid())
+  id          String      @id @default(uuid())
   name        String
   description String?
   imageUrl    String?
   createdById String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  isActive    Boolean       @default(true)
-  
-  createdBy   User          @relation("GroupCreator", fields: [createdById], references: [id], onDelete: Cascade)
-  members     GroupMember[]
-  expenses    GroupExpense[]
-  invitations GroupInvitation[]
-  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  isActive    Boolean     @default(true)
+  status      GroupStatus @default(ACTIVE)
+
+  createdBy        User              @relation("GroupCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  members          GroupMember[]
+  anonymousMembers AnonymousMember[]
+  expenses         GroupExpense[]
+  invitations      GroupInvitation[]
+
   @@index([createdById])
   @@map("groups")
 }
 
+model AnonymousMember {
+  id        String   @id @default(uuid())
+  groupId   String
+  name      String
+  email     String?
+  createdAt DateTime @default(now())
+  isActive  Boolean  @default(true)
+
+  group         Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  expenseShares ExpenseShare[] @relation("AnonymousExpenseShare")
+  paidExpenses  GroupExpense[] @relation("AnonymousExpensePayer")
+
+  @@index([groupId])
+  @@map("anonymous_members")
+}
+
 model GroupMember {
-  id       String           @id @default(uuid())
+  id       String          @id @default(uuid())
   groupId  String
   userId   String
-  role     GroupMemberRole  @default(MEMBER)
-  joinedAt DateTime         @default(now())
-  
+  role     GroupMemberRole @default(MEMBER)
+  joinedAt DateTime        @default(now())
+
   group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@unique([groupId, userId])
   @@index([groupId])
   @@index([userId])
@@ -123,44 +141,49 @@ model GroupMember {
 }
 
 model GroupExpense {
-  id            String         @id @default(uuid())
-  groupId       String
-  paidByUserId  String
-  title         String
-  description   String?
-  amount        Decimal
-  category      String
-  date          DateTime
-  receiptUrl    String?
-  splitType     SplitType      @default(EQUAL)
-  isSettled     Boolean        @default(false)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  
-  group     Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  paidBy    User           @relation("ExpensePayer", fields: [paidByUserId], references: [id], onDelete: Cascade)
-  shares    ExpenseShare[]
-  
+  id                      String    @id @default(uuid())
+  groupId                 String
+  paidByUserId            String?
+  paidByAnonymousMemberId String?
+  title                   String
+  description             String?
+  amount                  Decimal
+  category                String
+  date                    DateTime
+  receiptUrl              String?
+  splitType               SplitType @default(EQUAL)
+  isSettled               Boolean   @default(false)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  group           Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  paidBy          User?            @relation("ExpensePayer", fields: [paidByUserId], references: [id], onDelete: Cascade)
+  paidByAnonymous AnonymousMember? @relation("AnonymousExpensePayer", fields: [paidByAnonymousMemberId], references: [id], onDelete: Cascade)
+  shares          ExpenseShare[]
+
   @@index([groupId])
   @@index([paidByUserId])
+  @@index([paidByAnonymousMemberId])
   @@index([date])
   @@map("group_expenses")
 }
 
 model ExpenseShare {
-  id        String  @id @default(uuid())
-  expenseId String
-  userId    String
-  amount    Decimal
-  isPaid    Boolean @default(false)
-  paidAt    DateTime?
-  
-  expense GroupExpense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
-  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@unique([expenseId, userId])
+  id                String    @id @default(uuid())
+  expenseId         String
+  userId            String?
+  anonymousMemberId String?
+  amount            Decimal
+  isPaid            Boolean   @default(false)
+  paidAt            DateTime?
+
+  expense         GroupExpense     @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user            User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  anonymousMember AnonymousMember? @relation("AnonymousExpenseShare", fields: [anonymousMemberId], references: [id], onDelete: Cascade)
+
   @@index([expenseId])
   @@index([userId])
+  @@index([anonymousMemberId])
   @@map("expense_shares")
 }
 
@@ -174,10 +197,10 @@ model Settlement {
   settledAt   DateTime?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-  
+
   fromUser User @relation("SettlementFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
   toUser   User @relation("SettlementTo", fields: [toUserId], references: [id], onDelete: Cascade)
-  
+
   @@index([fromUserId])
   @@index([toUserId])
   @@index([status])
@@ -185,20 +208,20 @@ model Settlement {
 }
 
 model GroupInvitation {
-  id         String           @id @default(uuid())
-  groupId    String
-  senderUserId String
+  id             String           @id @default(uuid())
+  groupId        String
+  senderUserId   String
   receiverUserId String
-  email      String
-  status     InvitationStatus @default(PENDING)
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
-  expiresAt  DateTime
-  
+  email          String
+  status         InvitationStatus @default(PENDING)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  expiresAt      DateTime
+
   group    Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
   sender   User  @relation("InvitationSender", fields: [senderUserId], references: [id], onDelete: Cascade)
   receiver User? @relation("InvitationReceiver", fields: [receiverUserId], references: [id], onDelete: Cascade)
-  
+
   @@unique([groupId, email])
   @@index([groupId])
   @@index([senderUserId])
@@ -234,6 +257,12 @@ enum RecurringInterval {
 enum GroupMemberRole {
   ADMIN
   MEMBER
+}
+
+enum GroupStatus {
+  ACTIVE
+  FINISHED
+  ARCHIVED
 }
 
 enum SplitType {

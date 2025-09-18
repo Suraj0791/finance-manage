@@ -4,6 +4,7 @@ import { GroupHeader } from "../_components/group-header";
 import { GroupBalances } from "../_components/group-balances";
 import { GroupExpenses } from "../_components/group-expenses";
 import { AddExpenseDialog } from "../_components/add-expense-dialog";
+import { ExportBalancesButton } from "../_components/export-balances-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Receipt, DollarSign, TrendingUp } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -89,13 +90,27 @@ export default async function GroupPage({ params }) {
         </div>
 
         {/* Group Balances */}
-        <GroupBalances balances={balances.balances || []} />
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">Balances</h2>
+            <ExportBalancesButton
+              groupName={groupDetails.name}
+              balances={balances.balances || []}
+              settlements={balances.settlements || []}
+            />
+          </div>
+          <GroupBalances balances={balances.balances || []} />
+        </div>
 
         {/* Group Expenses */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Expenses</h2>
-            <AddExpenseDialog groupId={id} members={groupDetails.members} />
+            <AddExpenseDialog
+              groupId={id}
+              members={groupDetails.members}
+              anonymousMembers={groupDetails.anonymousMembers || []}
+            />
           </div>
           <GroupExpenses expenses={expenses} />
         </div>

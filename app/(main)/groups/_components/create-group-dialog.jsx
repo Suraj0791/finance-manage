@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -23,7 +23,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Loader2, X, Users } from "lucide-react";
 import { createGroup } from "@/actions/groups";
 import { toast } from "sonner";
 import useFetch from "@/hooks/use-fetch";
@@ -31,6 +32,14 @@ import useFetch from "@/hooks/use-fetch";
 const formSchema = z.object({
   name: z.string().min(1, "Group name is required").max(50, "Name too long"),
   description: z.string().max(200, "Description too long").optional(),
+  members: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Member name is required"),
+        email: z.string().email().optional().or(z.literal("")),
+      })
+    )
+    .optional(),
 });
 
 export function CreateGroupDialog() {
@@ -41,7 +50,13 @@ export function CreateGroupDialog() {
     defaultValues: {
       name: "",
       description: "",
+      members: [],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "members",
   });
 
   const {
@@ -50,16 +65,28 @@ export function CreateGroupDialog() {
     data: createdGroup,
   } = useFetch(createGroup);
 
+  const addMember = () => {
+    append({ name: "", email: "" });
+  };
+
   const onSubmit = async (data) => {
+    // Close dialog immediately for better UX
+    setOpen(false);
+    form.reset();
+    
+    // Show optimistic success message
+    toast.success("Creating group...");
+    
     try {
       await createGroupFn(data);
-      if (createdGroup?.success) {
-        toast.success("Group created successfully!");
-        setOpen(false);
-        form.reset();
-      }
+      // Replace the optimistic message with confirmation
+      toast.success("Group created successfully!");
     } catch (error) {
+      // Revert optimistic UI by showing error
       toast.error(error.message || "Failed to create group");
+      // Optionally reopen the dialog with the form data
+      // setOpen(true);
+      // form.reset(data);
     }
   };
 
@@ -75,7 +102,8 @@ export function CreateGroupDialog() {
         <DialogHeader>
           <DialogTitle>Create New Group</DialogTitle>
           <DialogDescription>
-            Create a new group to split expenses with friends or family.
+            Create a new group to split expenses. Add members by name - they can
+            join later with an invite link.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -109,6 +137,73 @@ export function CreateGroupDialog() {
                 </FormItem>
               )}
             />
+
+            {/* Members Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <FormLabel className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Members (Optional)
+                </FormLabel>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addMember}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Member
+                </Button>
+              </div>
+
+              <div className="text-sm text-muted-foreground">
+                Add members by name. They can join later using an invite link.
+              </div>
+
+              {fields.length > 0 && (
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {fields.map((field, index) => (
+                    <div key={field.id} className="flex gap-2 items-start">
+                      <FormField
+                        control={form.control}
+                        name={`members.${index}.name`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormControl>
+                              <Input placeholder="Member name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`members.${index}.email`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormControl>
+                              <Input
+                                placeholder="Email (optional)"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => remove(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="flex justify-end gap-2">
               <Button
                 type="button"

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { UserPlus, Settings, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { InviteUserDialog } from "./invite-user-dialog";
+import { InviteLinkDialog } from "./invite-link-dialog";
 
 export function GroupHeader({ group }) {
   const { name, description, imageUrl, members, createdBy } = group;
@@ -24,6 +25,7 @@ export function GroupHeader({ group }) {
           </Link>
           <div className="flex items-center gap-2">
             <InviteUserDialog groupId={group.id} />
+            <InviteLinkDialog groupId={group.id} />
             <Button variant="outline" size="sm">
               <Settings className="h-4 w-4 mr-2" />
               Settings

@@ -4,31 +4,48 @@
 //usefetch will accept argument a fucntion so we used cb 
 
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "sonner";
 
 const useFetch = (cb) => {
   const [data, setData] = useState(undefined);
-  const [loading, setLoading] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fn = async (...args) => {
+  // Use useCallback to prevent unnecessary re-renders
+  const fn = useCallback(async (...args) => {
+    // Prevent multiple simultaneous calls
+    if (loading) {
+      console.warn("API call already in progress, ignoring duplicate call");
+      return;
+    }
+
     setLoading(true);
     setError(null);
-   //before fetching our api we set loading to true and set error to null 
+    
     try {
       const response = await cb(...args);
       setData(response);
       setError(null);
+      return response;
     } catch (error) {
       setError(error);
-      toast.error(error.message);
+      // Don't show toast here anymore - let components handle their own UI feedback
+      console.error("API Error:", error);
+      throw error; // Re-throw so components can handle it
     } finally {
       setLoading(false);
     }
-  };
+  }, [cb, loading]);
 
-  return { data, loading, error, fn, setData };
+  // Reset function to clear state when needed
+  const reset = useCallback(() => {
+    setData(undefined);
+    setError(null);
+    setLoading(false);
+  }, []);
+
+  return { data, loading, error, fn, setData, reset };
 };
 
 export default useFetch;
