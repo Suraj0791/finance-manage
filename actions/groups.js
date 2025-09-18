@@ -548,6 +548,15 @@ export async function calculateGroupBalances(groupId) {
     });
 
     // Calculate what each person paid vs what they owe
+    const totalPaidByUser = {}; // Track how much each person actually paid
+    const totalOwedByUser = {}; // Track how much each person owes
+
+    // Initialize tracking objects
+    Object.keys(balances).forEach((userId) => {
+      totalPaidByUser[userId] = 0;
+      totalOwedByUser[userId] = 0;
+    });
+
     expenses.forEach((expense) => {
       const totalAmount = expense.amount.toNumber();
       const payer = expense.paidBy || expense.paidByAnonymous;
@@ -555,6 +564,7 @@ export async function calculateGroupBalances(groupId) {
       if (payer) {
         // Person who paid gets credited
         balances[payer.id] += totalAmount;
+        totalPaidByUser[payer.id] += totalAmount;
       }
 
       // Each person who has a share gets debited
@@ -563,6 +573,7 @@ export async function calculateGroupBalances(groupId) {
         const participant = share.user || share.anonymousMember;
         if (participant) {
           balances[participant.id] -= shareAmount;
+          totalOwedByUser[participant.id] += shareAmount;
         }
       });
     });
@@ -572,6 +583,8 @@ export async function calculateGroupBalances(groupId) {
       user: userMap[userId],
       balance: Number(balance.toFixed(2)),
       netBalance: Number(balance.toFixed(2)),
+      totalPaid: Number((totalPaidByUser[userId] || 0).toFixed(2)),
+      totalOwed: Number((totalOwedByUser[userId] || 0).toFixed(2)),
       owes: balance < 0 ? Math.abs(balance) : 0,
       owed: balance > 0 ? balance : 0,
     }));
@@ -669,6 +682,7 @@ export async function generateGroupInviteLink(groupId) {
       data: {
         groupId,
         senderUserId: user.id,
+        receiverUserId: undefined, // No specific receiver for invite links
         email: `invite_link_${token}`,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
         status: "PENDING",

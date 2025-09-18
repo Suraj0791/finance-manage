@@ -11,7 +11,16 @@ import { InviteLinkDialog } from "./invite-link-dialog";
 import { GroupSettingsDialog } from "./group-settings-dialog";
 
 export function GroupHeader({ group, currentUserId }) {
-  const { name, description, imageUrl, members, createdBy } = group;
+  const { name, description, imageUrl, members, anonymousMembers, createdBy } =
+    group;
+  const allMembers = [
+    ...members.map((m) => ({ ...m.user, type: "regular", memberRole: m.role })),
+    ...(anonymousMembers || []).map((m) => ({
+      ...m,
+      type: "anonymous",
+      memberRole: "MEMBER",
+    })),
+  ];
   const isAdmin = members.some(
     (m) => m.user.id === currentUserId && m.role === "ADMIN"
   );
@@ -56,31 +65,27 @@ export function GroupHeader({ group, currentUserId }) {
             )}
             <div className="flex items-center gap-4">
               <div className="flex -space-x-2">
-                {members.slice(0, 5).map((member) => (
+                {allMembers.slice(0, 5).map((member, index) => (
                   <Avatar
-                    key={member.id}
+                    key={member.id || index}
                     className="h-8 w-8 border-2 border-white"
                   >
-                    <AvatarImage
-                      src={member.user.imageUrl}
-                      alt={member.user.name}
-                    />
+                    <AvatarImage src={member.imageUrl} alt={member.name} />
                     <AvatarFallback className="text-xs">
-                      {member.user.name?.charAt(0) ||
-                        member.user.email?.charAt(0)}
+                      {member.name?.charAt(0) || member.email?.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                 ))}
-                {members.length > 5 && (
+                {allMembers.length > 5 && (
                   <div className="h-8 w-8 rounded-full bg-muted border-2 border-white flex items-center justify-center">
                     <span className="text-xs font-medium">
-                      +{members.length - 5}
+                      +{allMembers.length - 5}
                     </span>
                   </div>
                 )}
               </div>
               <span className="text-sm text-muted-foreground">
-                {members.length} member{members.length !== 1 ? "s" : ""}
+                {allMembers.length} member{allMembers.length !== 1 ? "s" : ""}
               </span>
             </div>
           </div>

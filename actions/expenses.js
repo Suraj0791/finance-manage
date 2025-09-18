@@ -474,10 +474,9 @@ export async function recordSettlementPayment(
         fromUserId,
         toUserId,
         amount: parseFloat(amount),
-        groupId,
         description: `Settlement payment in group`,
         status: "COMPLETED",
-        completedAt: new Date(),
+        settledAt: new Date(),
       },
       include: {
         fromUser: {

@@ -25,7 +25,8 @@ export function ExpenseOverview({
     (balance) => balance.user.id === currentUserId
   );
 
-  const totalMembers = groupDetails.members.length;
+  const totalMembers =
+    groupDetails.members.length + (groupDetails.anonymousMembers?.length || 0);
   const averagePerPerson = totalMembers > 0 ? totalExpenses / totalMembers : 0;
 
   return (
@@ -164,8 +165,13 @@ export function ExpenseOverview({
                       )}
                     </div>
                     <div className="text-sm text-gray-600">
-                      Paid {formatCurrency(balance.totalPaid || 0)} • Owes{" "}
-                      {formatCurrency(balance.totalOwed || 0)}
+                      Paid {formatCurrency(balance.totalPaid || 0)}
+                      {balance.netBalance < 0 && (
+                        <span>
+                          {" "}
+                          • Owes {formatCurrency(balance.totalOwed || 0)}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
