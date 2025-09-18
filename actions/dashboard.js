@@ -2,7 +2,7 @@
 import { withDbConnection, handleDatabaseError } from "@/lib/db-wrapper";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { revalidatePath, unstable_cache } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 
 const serializeTransaction = (obj) => {
   const serialized = { ...obj };
@@ -115,7 +115,13 @@ export async function createAccount(data) {
       // Serialize the account before returning
       const serializedAccount = serializeTransaction(account);
 
+      // Revalidate paths and invalidate cache
       revalidatePath("/dashboard");
+      revalidatePath("/account");
+
+      // Invalidate the accounts cache
+      revalidateTag("accounts");
+
       return { success: true, data: serializedAccount };
     });
   } catch (error) {

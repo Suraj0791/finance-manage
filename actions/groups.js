@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import crypto from "crypto";
 
 const serializeDecimal = (obj) => {
@@ -73,7 +73,10 @@ export async function createGroup(data) {
       },
     });
 
+    // Revalidate paths and cache
     revalidatePath("/groups");
+    revalidateTag("groups");
+    
     return { success: true, data: group };
   } catch (error) {
     throw new Error(error.message);
