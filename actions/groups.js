@@ -76,7 +76,7 @@ export async function createGroup(data) {
     // Revalidate paths and cache
     revalidatePath("/groups");
     revalidateTag("groups");
-    
+
     return { success: true, data: group };
   } catch (error) {
     throw new Error(error.message);
