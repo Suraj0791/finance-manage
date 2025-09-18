@@ -103,10 +103,10 @@ export function AddExpenseDialog({ groupId, members, anonymousMembers = [] }) {
     // Close dialog immediately for better UX
     setOpen(false);
     form.reset();
-    
+
     // Show optimistic success message
     toast.success("Adding expense...");
-    
+
     try {
       await createExpenseFn(expenseData);
       // Replace the optimistic message with confirmation

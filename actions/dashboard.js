@@ -42,10 +42,10 @@ const getCachedUserAccounts = unstable_cache(
       return accounts.map(serializeTransaction);
     });
   },
-  ['user-accounts'],
+  ["user-accounts"],
   {
     revalidate: 30, // Cache for 30 seconds
-    tags: ['accounts']
+    tags: ["accounts"],
   }
 );
 

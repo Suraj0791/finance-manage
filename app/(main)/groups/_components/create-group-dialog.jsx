@@ -73,10 +73,10 @@ export function CreateGroupDialog() {
     // Close dialog immediately for better UX
     setOpen(false);
     form.reset();
-    
+
     // Show optimistic success message
     toast.success("Creating group...");
-    
+
     try {
       await createGroupFn(data);
       // Replace the optimistic message with confirmation

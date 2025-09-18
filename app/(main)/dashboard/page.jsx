@@ -68,10 +68,7 @@ async function OverviewSection() {
   ]);
 
   return (
-    <DashboardOverview
-      accounts={accounts}
-      transactions={transactions || []}
-    />
+    <DashboardOverview accounts={accounts} transactions={transactions || []} />
   );
 }
 
@@ -90,21 +87,29 @@ export default async function DashboardPage() {
       </Suspense>
 
       {/* Budget Progress */}
-      <Suspense fallback={<div className="h-24 bg-gray-100 rounded animate-pulse" />}>
+      <Suspense
+        fallback={<div className="h-24 bg-gray-100 rounded animate-pulse" />}
+      >
         <BudgetSection />
       </Suspense>
 
       {/* Dashboard Overview */}
-      <Suspense fallback={<div className="h-40 bg-gray-100 rounded animate-pulse" />}>
+      <Suspense
+        fallback={<div className="h-40 bg-gray-100 rounded animate-pulse" />}
+      >
         <OverviewSection />
       </Suspense>
 
       {/* Accounts Grid */}
-      <Suspense fallback={<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-32 bg-gray-100 rounded animate-pulse" />
-        ))}
-      </div>}>
+      <Suspense
+        fallback={
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-32 bg-gray-100 rounded animate-pulse" />
+            ))}
+          </div>
+        }
+      >
         <AccountsSection />
       </Suspense>
     </div>

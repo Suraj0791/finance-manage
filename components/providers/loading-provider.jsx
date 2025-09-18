@@ -19,15 +19,18 @@ export function LoadingProvider({ children }) {
     setLoadingMessage("");
   }, []);
 
-  const withLoading = useCallback(async (asyncFn, message = "Loading...") => {
-    showLoading(message);
-    try {
-      const result = await asyncFn();
-      return result;
-    } finally {
-      hideLoading();
-    }
-  }, [showLoading, hideLoading]);
+  const withLoading = useCallback(
+    async (asyncFn, message = "Loading...") => {
+      showLoading(message);
+      try {
+        const result = await asyncFn();
+        return result;
+      } finally {
+        hideLoading();
+      }
+    },
+    [showLoading, hideLoading]
+  );
 
   const value = {
     isLoading,

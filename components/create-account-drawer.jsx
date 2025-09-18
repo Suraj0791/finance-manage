@@ -27,10 +27,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { createAccount } from "@/actions/dashboard";
 import { accountSchema } from "@/app/lib/schema";
- 
 
-
-//usefrom will first take a resolver , zodresolver is going to connect us with zod schema 
+//usefrom will first take a resolver , zodresolver is going to connect us with zod schema
 //regsiter will connect our form to react-hook-form
 //watch is used to monitor any single field of form
 //reset use to reset form after submitting
@@ -53,7 +51,6 @@ export function CreateAccountDrawer({ children }) {
     },
   });
 
-
   // we are passing createaccount server action inside usefetch
   const {
     loading: createAccountLoading,
@@ -66,10 +63,10 @@ export function CreateAccountDrawer({ children }) {
     // Close drawer immediately for better UX
     setOpen(false);
     reset();
-    
+
     // Show optimistic success message
     toast.success("Creating account...");
-    
+
     try {
       await createAccountFn(data);
       // Replace the optimistic message with confirmation
@@ -119,7 +116,7 @@ export function CreateAccountDrawer({ children }) {
                 Account Type
               </label>
               <Select
-              //dynamically changing value using setvalue
+                //dynamically changing value using setvalue
                 onValueChange={(value) => setValue("type", value)}
                 //watch type yaha pr monitor kr rha h nd whenever it thatis type chnages ye update ho jaata h defaut value m
                 defaultValue={watch("type")}
