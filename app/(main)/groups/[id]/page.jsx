@@ -1,5 +1,6 @@
 import { getGroupDetails, calculateGroupBalances } from "@/actions/groups";
 import { getGroupExpenses } from "@/actions/expenses";
+import { auth } from "@clerk/nextjs/server";
 import { GroupHeader } from "../_components/group-header";
 import { GroupBalances } from "../_components/group-balances";
 import { GroupExpenses } from "../_components/group-expenses";
@@ -11,6 +12,7 @@ import { notFound } from "next/navigation";
 
 export default async function GroupPage({ params }) {
   const { id } = await params;
+  const { userId } = await auth();
 
   try {
     const [groupDetails, balances, expenses] = await Promise.all([
@@ -23,6 +25,13 @@ export default async function GroupPage({ params }) {
       notFound();
     }
 
+    // Get current user info
+    const { db } = await import("@/lib/prisma");
+    const currentUser = await db.user.findUnique({
+      where: { clerkUserId: userId },
+      select: { id: true },
+    });
+
     const totalExpenses = expenses.reduce(
       (sum, expense) => sum + expense.amount,
       0
@@ -31,7 +40,7 @@ export default async function GroupPage({ params }) {
     return (
       <div className="space-y-6">
         {/* Group Header */}
-        <GroupHeader group={groupDetails} />
+        <GroupHeader group={groupDetails} currentUserId={currentUser?.id} />
 
         {/* Quick Stats */}
         <div className="grid gap-4 md:grid-cols-4">

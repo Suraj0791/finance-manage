@@ -51,45 +51,6 @@ function calculateSettlements(balances) {
   return settlements;
 }
 
-// Calculate optimal settlements
-function calculateSettlements(balances) {
-  const debtors = balances
-    .filter((b) => b.netBalance < -0.01)
-    .map((b) => ({ ...b, remaining: Math.abs(b.netBalance) }))
-    .sort((a, b) => b.remaining - a.remaining);
-
-  const creditors = balances
-    .filter((b) => b.netBalance > 0.01)
-    .map((b) => ({ ...b, remaining: b.netBalance }))
-    .sort((a, b) => b.remaining - a.remaining);
-
-  const settlements = [];
-  let i = 0,
-    j = 0;
-
-  while (i < debtors.length && j < creditors.length) {
-    const debtor = debtors[i];
-    const creditor = creditors[j];
-    const amount = Math.min(debtor.remaining, creditor.remaining);
-
-    if (amount > 0.01) {
-      settlements.push({
-        from: debtor.user,
-        to: creditor.user,
-        amount: Number(amount.toFixed(2)),
-      });
-    }
-
-    debtor.remaining -= amount;
-    creditor.remaining -= amount;
-
-    if (debtor.remaining < 0.01) i++;
-    if (creditor.remaining < 0.01) j++;
-  }
-
-  return settlements;
-}
-
 export function GroupBalances({ balances }) {
   const positiveBalances = balances.filter((b) => b.netBalance > 0);
   const negativeBalances = balances.filter((b) => b.netBalance < 0);

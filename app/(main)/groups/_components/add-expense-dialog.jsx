@@ -237,13 +237,13 @@ export function AddExpenseDialog({ groupId, members, anonymousMembers = [] }) {
                       </FormControl>
                       <SelectContent>
                         {expenseCategories.map((category) => (
-                          <SelectItem
-                            key={category.value}
-                            value={category.value}
-                          >
+                          <SelectItem key={category.id} value={category.id}>
                             <div className="flex items-center gap-2">
-                              <span className="text-lg">{category.emoji}</span>
-                              {category.label}
+                              <div
+                                className="w-3 h-3 rounded-full"
+                                style={{ backgroundColor: category.color }}
+                              />
+                              {category.name}
                             </div>
                           </SelectItem>
                         ))}

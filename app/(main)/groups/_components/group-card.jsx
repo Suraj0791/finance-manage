@@ -10,6 +10,9 @@ import { formatCurrency } from "@/lib/utils";
 export function GroupCard({ group }) {
   const { id, name, description, imageUrl, members, _count } = group;
 
+  // Calculate total member count (registered + anonymous)
+  const totalMemberCount = _count.members + (_count.anonymousMembers || 0);
+
   // Get member initials for avatar display
   const memberInitials = members
     .slice(0, 3)
@@ -50,7 +53,7 @@ export function GroupCard({ group }) {
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
-                {_count.members} member{_count.members !== 1 ? "s" : ""}
+                {totalMemberCount} member{totalMemberCount !== 1 ? "s" : ""}
               </span>
             </div>
             <div className="flex -space-x-2">

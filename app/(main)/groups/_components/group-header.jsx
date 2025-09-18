@@ -8,9 +8,13 @@ import { UserPlus, Settings, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { InviteUserDialog } from "./invite-user-dialog";
 import { InviteLinkDialog } from "./invite-link-dialog";
+import { GroupSettingsDialog } from "./group-settings-dialog";
 
-export function GroupHeader({ group }) {
+export function GroupHeader({ group, currentUserId }) {
   const { name, description, imageUrl, members, createdBy } = group;
+  const isAdmin = members.some(
+    (m) => m.user.id === currentUserId && m.role === "ADMIN"
+  );
 
   return (
     <Card>
@@ -26,10 +30,11 @@ export function GroupHeader({ group }) {
           <div className="flex items-center gap-2">
             <InviteUserDialog groupId={group.id} />
             <InviteLinkDialog groupId={group.id} />
-            <Button variant="outline" size="sm">
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
-            </Button>
+            <GroupSettingsDialog
+              group={group}
+              currentUserId={currentUserId}
+              isAdmin={isAdmin}
+            />
           </div>
         </div>
       </CardHeader>

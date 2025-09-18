@@ -119,9 +119,19 @@ export async function getUserGroups() {
             },
           },
         },
+        anonymousMembers: {
+          where: {
+            isActive: true,
+          },
+        },
         _count: {
           select: {
             members: true,
+            anonymousMembers: {
+              where: {
+                isActive: true,
+              },
+            },
             expenses: true,
           },
         },
@@ -698,6 +708,99 @@ export async function joinGroupViaInviteLink(groupId, token) {
     revalidatePath("/groups");
     revalidatePath(`/groups/${groupId}`);
     return { success: true, group: invitation.group };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+// Update group status
+export async function updateGroupStatus(groupId, status) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if user is admin of the group
+    const membership = await db.groupMember.findFirst({
+      where: {
+        groupId,
+        userId: user.id,
+        role: "ADMIN",
+      },
+    });
+
+    if (!membership) {
+      throw new Error("You don't have permission to update this group");
+    }
+
+    const updatedGroup = await db.group.update({
+      where: { id: groupId },
+      data: { status },
+    });
+
+    revalidatePath(`/groups/${groupId}`);
+    revalidatePath("/groups");
+    return { success: true, group: updatedGroup };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+// Remove member from group
+export async function removeGroupMember(
+  groupId,
+  memberId,
+  memberType = "user"
+) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if user is admin of the group
+    const membership = await db.groupMember.findFirst({
+      where: {
+        groupId,
+        userId: user.id,
+        role: "ADMIN",
+      },
+    });
+
+    if (!membership) {
+      throw new Error(
+        "You don't have permission to remove members from this group"
+      );
+    }
+
+    if (memberType === "user") {
+      // Remove registered user
+      await db.groupMember.delete({
+        where: { id: memberId },
+      });
+    } else {
+      // Remove anonymous member
+      await db.anonymousMember.update({
+        where: { id: memberId },
+        data: { isActive: false },
+      });
+    }
+
+    revalidatePath(`/groups/${groupId}`);
+    return { success: true };
   } catch (error) {
     throw new Error(error.message);
   }
