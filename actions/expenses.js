@@ -463,28 +463,96 @@ export async function recordSettlementPayment(
       throw new Error("User not found");
     }
 
+    // Check if the IDs are for registered users or anonymous members
+    let fromUser = null;
+    let toUser = null;
+    let fromAnonymousMember = null;
+    let toAnonymousMember = null;
+
+    // Try to find as registered users first
+    if (fromUserId) {
+      fromUser = await db.user.findUnique({
+        where: { id: fromUserId },
+        select: { id: true, name: true, email: true, imageUrl: true },
+      });
+
+      if (!fromUser) {
+        // If not found as registered user, try as anonymous member
+        fromAnonymousMember = await db.anonymousMember.findUnique({
+          where: { id: fromUserId },
+          select: { id: true, name: true, email: true },
+        });
+      }
+    }
+
+    if (toUserId) {
+      toUser = await db.user.findUnique({
+        where: { id: toUserId },
+        select: { id: true, name: true, email: true, imageUrl: true },
+      });
+
+      if (!toUser) {
+        // If not found as registered user, try as anonymous member
+        toAnonymousMember = await db.anonymousMember.findUnique({
+          where: { id: toUserId },
+          select: { id: true, name: true, email: true },
+        });
+      }
+    }
+
     // Verify user is involved in this settlement
-    if (user.id !== fromUserId && user.id !== toUserId) {
+    const userIsFromUser = fromUser && user.id === fromUser.id;
+    const userIsToUser = toUser && user.id === toUser.id;
+
+    if (!userIsFromUser && !userIsToUser) {
       throw new Error("You can only record payments you're involved in");
+    }
+
+    // Prepare settlement data
+    const settlementData = {
+      amount: parseFloat(amount),
+      description: `Settlement payment in group`,
+      status: "COMPLETED",
+      settledAt: new Date(),
+    };
+
+    // Add appropriate foreign key references
+    if (fromUser) {
+      settlementData.fromUserId = fromUser.id;
+    } else if (fromAnonymousMember) {
+      settlementData.fromAnonymousMemberId = fromAnonymousMember.id;
+    }
+
+    if (toUser) {
+      settlementData.toUserId = toUser.id;
+    } else if (toAnonymousMember) {
+      settlementData.toAnonymousMemberId = toAnonymousMember.id;
     }
 
     // Create a settlement record
     const settlement = await db.settlement.create({
-      data: {
-        fromUserId,
-        toUserId,
-        amount: parseFloat(amount),
-        description: `Settlement payment in group`,
-        status: "COMPLETED",
-        settledAt: new Date(),
-      },
+      data: settlementData,
       include: {
-        fromUser: {
-          select: { id: true, name: true, email: true, imageUrl: true },
-        },
-        toUser: {
-          select: { id: true, name: true, email: true, imageUrl: true },
-        },
+        fromUser: fromUser
+          ? {
+              select: { id: true, name: true, email: true, imageUrl: true },
+            }
+          : false,
+        toUser: toUser
+          ? {
+              select: { id: true, name: true, email: true, imageUrl: true },
+            }
+          : false,
+        fromAnonymousMember: fromAnonymousMember
+          ? {
+              select: { id: true, name: true, email: true },
+            }
+          : false,
+        toAnonymousMember: toAnonymousMember
+          ? {
+              select: { id: true, name: true, email: true },
+            }
+          : false,
       },
     });
 

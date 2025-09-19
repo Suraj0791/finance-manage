@@ -116,9 +116,11 @@ model AnonymousMember {
   createdAt DateTime @default(now())
   isActive  Boolean  @default(true)
 
-  group         Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  expenseShares ExpenseShare[] @relation("AnonymousExpenseShare")
-  paidExpenses  GroupExpense[] @relation("AnonymousExpensePayer")
+  group               Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  expenseShares       ExpenseShare[] @relation("AnonymousExpenseShare")
+  paidExpenses        GroupExpense[] @relation("AnonymousExpensePayer")
+  settlementsFrom     Settlement[]   @relation("SettlementFromAnonymous")
+  settlementsTo       Settlement[]   @relation("SettlementToAnonymous")
 
   @@index([groupId])
   @@map("anonymous_members")
@@ -188,21 +190,27 @@ model ExpenseShare {
 }
 
 model Settlement {
-  id          String           @id @default(uuid())
-  fromUserId  String
-  toUserId    String
-  amount      Decimal
-  description String?
-  status      SettlementStatus @default(PENDING)
-  settledAt   DateTime?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id                    String           @id @default(uuid())
+  fromUserId            String?
+  toUserId              String?
+  fromAnonymousMemberId String?
+  toAnonymousMemberId   String?
+  amount                Decimal
+  description           String?
+  status                SettlementStatus @default(PENDING)
+  settledAt             DateTime?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
 
-  fromUser User @relation("SettlementFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
-  toUser   User @relation("SettlementTo", fields: [toUserId], references: [id], onDelete: Cascade)
+  fromUser            User?            @relation("SettlementFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser              User?            @relation("SettlementTo", fields: [toUserId], references: [id], onDelete: Cascade)
+  fromAnonymousMember AnonymousMember? @relation("SettlementFromAnonymous", fields: [fromAnonymousMemberId], references: [id], onDelete: Cascade)
+  toAnonymousMember   AnonymousMember? @relation("SettlementToAnonymous", fields: [toAnonymousMemberId], references: [id], onDelete: Cascade)
 
   @@index([fromUserId])
   @@index([toUserId])
+  @@index([fromAnonymousMemberId])
+  @@index([toAnonymousMemberId])
   @@index([status])
   @@map("settlements")
 }
