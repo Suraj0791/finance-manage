@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { db } from "@/lib/prisma";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import crypto from "crypto";
@@ -16,11 +16,11 @@ const serializeDecimal = (obj) => {
 // Create a new group
 export async function createGroup(data) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -86,11 +86,11 @@ export async function createGroup(data) {
 // Get user's groups
 export async function getUserGroups() {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -150,11 +150,11 @@ export async function getUserGroups() {
 // Get group details
 export async function getGroupDetails(groupId) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -258,11 +258,11 @@ export async function getGroupDetails(groupId) {
 // Invite user to group
 export async function inviteUserToGroup(groupId, email) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -352,11 +352,11 @@ export async function inviteUserToGroup(groupId, email) {
 // Accept group invitation
 export async function acceptGroupInvitation(invitationId) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -412,11 +412,11 @@ export async function acceptGroupInvitation(invitationId) {
 // Get user's pending invitations
 export async function getUserInvitations() {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -462,11 +462,11 @@ export async function getUserInvitations() {
 // Calculate group balances and settlements
 export async function calculateGroupBalances(groupId) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -637,11 +637,11 @@ export async function calculateGroupBalances(groupId) {
 // Generate invite link for group
 export async function generateGroupInviteLink(groupId) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -703,11 +703,11 @@ export async function generateGroupInviteLink(groupId) {
 // Join group via invite link
 export async function joinGroupViaInviteLink(groupId, token) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -765,11 +765,11 @@ export async function joinGroupViaInviteLink(groupId, token) {
 // Update group status
 export async function updateGroupStatus(groupId, status) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -809,11 +809,11 @@ export async function removeGroupMember(
   memberType = "user"
 ) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -858,11 +858,11 @@ export async function removeGroupMember(
 // Delete group permanently
 export async function deleteGroup(groupId) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {

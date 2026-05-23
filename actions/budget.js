@@ -2,17 +2,17 @@
 
 import { withDbConnection, handleDatabaseError } from "@/lib/db-wrapper";
 import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 
 export async function getCurrentBudget(accountId) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     return await withDbConnection(async (db) => {
       const user = await db.user.findUnique({
-        where: { clerkUserId: userId },
+        where: { email: session.user.email },
       });
 
       if (!user) {
@@ -68,12 +68,12 @@ export async function getCurrentBudget(accountId) {
 
 export async function updateBudget(amount) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     return await withDbConnection(async (db) => {
       const user = await db.user.findUnique({
-        where: { clerkUserId: userId },
+        where: { email: session.user.email },
       });
 
       if (!user) throw new Error("User not found");

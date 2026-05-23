@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { withDbConnection, handleDatabaseError } from "@/lib/db-wrapper";
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -16,12 +16,12 @@ const serializeAmount = (obj) => ({
 // Create Transaction
 export async function createTransaction(data, req) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     return await withDbConnection(async (db) => {
       const user = await db.user.findUnique({
-        where: { clerkUserId: userId },
+        where: { email: session.user.email },
       });
 
       if (!user) {
@@ -78,12 +78,12 @@ export async function createTransaction(data, req) {
 
 export async function getTransaction(id) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     return await withDbConnection(async (db) => {
       const user = await db.user.findUnique({
-        where: { clerkUserId: userId },
+        where: { email: session.user.email },
       });
 
       if (!user) throw new Error("User not found");
@@ -107,11 +107,11 @@ export async function getTransaction(id) {
 
 export async function updateTransaction(id, data) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) throw new Error("User not found");
@@ -181,11 +181,11 @@ export async function updateTransaction(id, data) {
 // Get User Transactions
 export async function getUserTransactions(query = {}) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {

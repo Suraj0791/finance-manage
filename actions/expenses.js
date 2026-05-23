@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -15,11 +15,11 @@ const serializeDecimal = (obj) => {
 // Create group expense
 export async function createGroupExpense(data) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -172,11 +172,11 @@ export async function createGroupExpense(data) {
 // Get group expenses
 export async function getGroupExpenses(groupId) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -253,11 +253,11 @@ export async function getGroupExpenses(groupId) {
 // Calculate group balances
 export async function calculateGroupBalances(groupId) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -352,11 +352,11 @@ export async function createSettlement(
   description = ""
 ) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -398,11 +398,11 @@ export async function createSettlement(
 // Mark settlement as completed
 export async function markSettlementCompleted(settlementId) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -452,11 +452,11 @@ export async function recordSettlementPayment(
   groupId
 ) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
@@ -567,11 +567,11 @@ export async function recordSettlementPayment(
 // Get user's settlements
 export async function getUserSettlements() {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {
