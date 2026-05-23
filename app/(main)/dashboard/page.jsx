@@ -12,8 +12,8 @@ import { Plus } from "lucide-react";
 import { DashboardOverview } from "./_components/transaction-overview";
 import { DashboardFallback } from "./_components/dashboard-fallback";
 import { DashboardSkeleton } from "@/components/ui/loading";
-import { currentUser } from "@clerk/nextjs/server";
-import ProtectedRoute from "./protected-route";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 // Separate components for better loading states
 async function AccountsSection() {
@@ -74,9 +74,9 @@ async function OverviewSection() {
 
 export default async function DashboardPage() {
   // First verify the user is authenticated
-  const user = await currentUser();
-  if (!user) {
-    return <ProtectedRoute />;
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/login");
   }
 
   return (

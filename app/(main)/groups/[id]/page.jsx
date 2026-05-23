@@ -1,6 +1,6 @@
 import { getGroupDetails, calculateGroupBalances } from "@/actions/groups";
 import { getGroupExpenses } from "@/actions/expenses";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { GroupHeader } from "../_components/group-header";
 import { ExpenseOverview } from "../_components/expense-overview";
 import { SettlementSuggestions } from "../_components/settlement-suggestions";
@@ -20,7 +20,7 @@ import { notFound } from "next/navigation";
 
 export default async function GroupPage({ params }) {
   const { id } = await params;
-  const { userId } = await auth();
+  const session = await auth();
 
   try {
     const [groupDetails, balances, expenses] = await Promise.all([
@@ -36,7 +36,7 @@ export default async function GroupPage({ params }) {
     // Get current user info
     const { db } = await import("@/lib/prisma");
     const currentUser = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session?.user?.email },
       select: { id: true },
     });
 

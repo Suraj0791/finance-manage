@@ -1,5 +1,5 @@
 import { joinGroupViaInviteLink } from "@/actions/groups";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,10 @@ import { JoinGroupButton } from "./_components/join-group-button";
 
 export default async function InvitePage({ params }) {
   const { groupId, token } = await params;
-  const { userId } = await auth();
+  const session = await auth();
 
-  if (!userId) {
-    redirect(`/sign-in?redirect_url=/invite/${groupId}/${token}`);
+  if (!session?.user) {
+    redirect(`/login?callbackUrl=/invite/${groupId}/${token}`);
   }
 
   // Get group information first
@@ -63,7 +63,7 @@ export default async function InvitePage({ params }) {
 
       // Check if user is already a member
       const user = await db.user.findUnique({
-        where: { clerkUserId: userId },
+        where: { email: session.user.email },
       });
 
       if (user) {
