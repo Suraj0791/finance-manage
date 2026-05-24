@@ -108,6 +108,7 @@ export default function PlaygroundPage() {
   const [ocrFile, setOcrFile] = useState(null);
   const [ocrLoading, setOcrLoading] = useState(false);
   const [ocrResult, setOcrResult] = useState(null);
+  const [demoSaved, setDemoSaved] = useState(false);
 
   const handleOcrScan = async (e) => {
     const file = e.target.files?.[0];
@@ -119,6 +120,7 @@ export default function PlaygroundPage() {
     }
 
     setOcrFile(file);
+    setDemoSaved(false);
     setOcrLoading(true);
     const toastId = toast.loading("Analyzing receipt with Gemini 2.5 Flash...");
 
@@ -254,6 +256,12 @@ export default function PlaygroundPage() {
     });
   };
 
+  const handleResetDemo = () => {
+    setOcrFile(null);
+    setOcrResult(null);
+    setDemoSaved(false);
+  };
+
   const handleDemoSubmit = () => {
     if (!ocrResult || !ocrResult.amount) return;
 
@@ -264,8 +272,7 @@ export default function PlaygroundPage() {
       duration: 5000,
     });
 
-    setOcrFile(null);
-    setOcrResult(null);
+    setDemoSaved(true);
   };
 
   return (
@@ -549,7 +556,34 @@ export default function PlaygroundPage() {
               </div>
 
               <div className="pt-6">
-                {ocrResult ? (
+                {demoSaved ? (
+                  <div className="space-y-3 bg-emerald-950/30 border border-emerald-800/40 p-4 rounded-xl text-center">
+                    <div className="mx-auto w-10 h-10 rounded-full bg-emerald-900/30 flex items-center justify-center text-emerald-400">
+                      <CheckCircle2 className="h-6 w-6" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-sm text-emerald-400 text-center">Transaction Saved!</h4>
+                      <p className="text-[11px] text-slate-400 leading-relaxed text-center">
+                        The amount has been added to the **Interactive Charts** tab. Switch tabs to see your simulated expense update in real-time.
+                      </p>
+                    </div>
+                    <div className="flex gap-2 pt-1.5 justify-center">
+                      <Button
+                        onClick={() => setActiveTab("charts")}
+                        variant="outline"
+                        className="flex-1 bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-900 hover:text-slate-100 text-[11px] h-8"
+                      >
+                        View Charts
+                      </Button>
+                      <Button
+                        onClick={handleResetDemo}
+                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] h-8"
+                      >
+                        Scan Another
+                      </Button>
+                    </div>
+                  </div>
+                ) : ocrResult ? (
                   <Button
                     onClick={handleDemoSubmit}
                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow-lg shadow-emerald-900/20 border-none transition-all flex items-center justify-center gap-2 hover:scale-[1.01]"
