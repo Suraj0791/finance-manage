@@ -8,12 +8,29 @@ import {
 } from "@/data/landing";
 import { Badge } from "@/components/ui/badge";
 import ApiPingButton from "@/components/api-ping-button";
+import { RecruiterSandboxGuide } from "@/components/recruiter-sandbox-guide";
+import fs from "fs";
+import path from "path";
 
 export default function LandingPage() {
+  // Ensure the sample receipt image is copied to the public folder during render
+  try {
+    const srcPath = "C:\\Users\\suraj sharma\\.gemini\\antigravity-ide\\brain\\fdd96bd3-55ab-48c7-85ac-cbc3decdd8da\\sample_receipt_1779610405716.png";
+    const destPath = path.join(process.cwd(), "public", "sample-receipt.png");
+    if (fs.existsSync(srcPath) && !fs.existsSync(destPath)) {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  } catch (err) {
+    console.warn("Could not copy sample receipt to public folder:", err);
+  }
+
   return (
     <div className="bg-white">
       {/* Hero Section */}
       <HeroSection />
+
+      {/* Recruiter Interactive Onboarding & Test-Drive Roadmap */}
+      <RecruiterSandboxGuide />
 
       {/* Stats Section */}
       <section className="py-16 bg-blue-50">
@@ -41,7 +58,7 @@ export default function LandingPage() {
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Our platform provides all the tools you need to track, analyze,
-              and optimize your financial life.
+              and optimize your spending with real-time insights.
             </p>
           </div>
 
