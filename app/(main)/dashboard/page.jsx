@@ -12,6 +12,7 @@ import { Plus } from "lucide-react";
 import { DashboardOverview } from "./_components/transaction-overview";
 import { DashboardFallback } from "./_components/dashboard-fallback";
 import { DashboardSkeleton } from "@/components/ui/loading";
+import { SandboxControls } from "@/components/sandbox-controls";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
@@ -81,6 +82,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
+      {/* Recruiter Developer Sandbox Console */}
+      <SandboxControls />
       {/* Database Status */}
       <Suspense fallback={<div>Checking database connection...</div>}>
         <DatabaseStatus />
