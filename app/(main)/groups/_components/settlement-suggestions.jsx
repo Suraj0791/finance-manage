@@ -18,6 +18,7 @@ import {
 import { recordSettlementPayment } from "@/actions/expenses";
 import { toast } from "sonner";
 import useFetch from "@/hooks/use-fetch";
+import SettlementVisualizer from "./settlement-visualizer";
 
 // Function to calculate minimal settlement transactions
 function calculateSettlements(balances) {
@@ -58,6 +59,7 @@ function calculateSettlements(balances) {
 
 export function SettlementSuggestions({ balances, groupId, currentUserId }) {
   const [completedSettlements, setCompletedSettlements] = useState(new Set());
+  const [activeTab, setActiveTab] = useState("list");
 
   const { loading: recordPaymentLoading, fn: recordPaymentFn } = useFetch(
     recordSettlementPayment
@@ -109,17 +111,45 @@ export function SettlementSuggestions({ balances, groupId, currentUserId }) {
 
   return (
     <Card className="border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-yellow-50">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold text-orange-900 flex items-center gap-2">
-          <Handshake className="h-6 w-6" />
-          How to Settle All Debts
-        </CardTitle>
-        <p className="text-orange-700">
-          Here's the simplest way to settle all balances with{" "}
-          {settlements.length} transaction{settlements.length !== 1 ? "s" : ""}:
-        </p>
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+        <div>
+          <CardTitle className="text-xl font-bold text-orange-900 flex items-center gap-2">
+            <Handshake className="h-6 w-6" />
+            How to Settle All Debts
+          </CardTitle>
+          <p className="text-orange-700 text-sm mt-1">
+            Here's the simplest way to settle all balances with{" "}
+            {settlements.length} transaction{settlements.length !== 1 ? "s" : ""}:
+          </p>
+        </div>
+        <div className="flex bg-orange-100/60 p-1 rounded-lg border border-orange-200 w-fit self-start sm:self-auto">
+          <button
+            onClick={() => setActiveTab("list")}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+              activeTab === "list"
+                ? "bg-orange-600 text-white shadow-sm"
+                : "text-orange-950 hover:bg-orange-100"
+            }`}
+          >
+            List View
+          </button>
+          <button
+            onClick={() => setActiveTab("graph")}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+              activeTab === "graph"
+                ? "bg-orange-600 text-white shadow-sm"
+                : "text-orange-950 hover:bg-orange-100"
+            }`}
+          >
+            Interactive Graph
+          </button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        {activeTab === "graph" ? (
+          <SettlementVisualizer balances={balances} settlements={settlements} />
+        ) : (
+          <>
         {settlements.map((settlement, index) => (
           <div
             key={index}
@@ -222,6 +252,8 @@ export function SettlementSuggestions({ balances, groupId, currentUserId }) {
             and all debts will be cleared.
           </p>
         </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );
