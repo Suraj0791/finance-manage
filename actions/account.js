@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "@/lib/prisma";
+import { withDbConnection, handleDatabaseError } from "@/lib/db-wrapper";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 
@@ -16,36 +16,43 @@ const serializeDecimal = (obj) => {
 };
 
 export async function getAccountWithTransactions(accountId) {
-  const session = await auth();
-  if (!session?.user?.email) throw new Error("Unauthorized");
+  try {
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { email: session.user.email },
-  });
+    return await withDbConnection(async (db) => {
+      const user = await db.user.findUnique({
+        where: { email: session.user.email },
+      });
 
-  if (!user) throw new Error("User not found");
+      if (!user) throw new Error("User not found");
 
-  const account = await db.account.findUnique({
-    where: {
-      id: accountId,
-      userId: user.id,
-    },
-    include: {
-      transactions: {
-        orderBy: { date: "desc" },
-      },
-      _count: {
-        select: { transactions: true },
-      },
-    },
-  });
+      const account = await db.account.findUnique({
+        where: {
+          id: accountId,
+          userId: user.id,
+        },
+        include: {
+          transactions: {
+            orderBy: { date: "desc" },
+          },
+          _count: {
+            select: { transactions: true },
+          },
+        },
+      });
 
-  if (!account) return null;
+      if (!account) return null;
 
-  return {
-    ...serializeDecimal(account),
-    transactions: account.transactions.map(serializeDecimal),
-  };
+      return {
+        ...serializeDecimal(account),
+        transactions: account.transactions.map(serializeDecimal),
+      };
+    });
+  } catch (error) {
+    const dbError = handleDatabaseError(error);
+    throw new Error(dbError.message);
+  }
 }
 
 export async function bulkDeleteTransactions(transactionIds) {
@@ -53,61 +60,64 @@ export async function bulkDeleteTransactions(transactionIds) {
     const session = await auth();
     if (!session?.user?.email) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
-      where: { email: session.user.email },
-    });
+    return await withDbConnection(async (db) => {
+      const user = await db.user.findUnique({
+        where: { email: session.user.email },
+      });
 
-    if (!user) throw new Error("User not found");
+      if (!user) throw new Error("User not found");
 
-    // Get transactions to calculate balance changes
-    const transactions = await db.transaction.findMany({
-      where: {
-        id: { in: transactionIds },
-        userId: user.id,
-      },
-    });
-
-    // Group transactions by account to update balances
-    const accountBalanceChanges = transactions.reduce((acc, transaction) => {
-      const change =
-        transaction.type === "EXPENSE"
-          ? transaction.amount
-          : -transaction.amount;
-      acc[transaction.accountId] = (acc[transaction.accountId] || 0) + change;
-      return acc;
-    }, {});
-
-    // Delete transactions and update account balances in a transaction
-    await db.$transaction(async (tx) => {
-      // Delete transactions
-      await tx.transaction.deleteMany({
+      // Get transactions to calculate balance changes
+      const transactions = await db.transaction.findMany({
         where: {
           id: { in: transactionIds },
           userId: user.id,
         },
       });
 
-      // Update account balances
-      for (const [accountId, balanceChange] of Object.entries(
-        accountBalanceChanges
-      )) {
-        await tx.account.update({
-          where: { id: accountId },
-          data: {
-            balance: {
-              increment: balanceChange,
-            },
+      // Group transactions by account to update balances
+      const accountBalanceChanges = transactions.reduce((acc, transaction) => {
+        const change =
+          transaction.type === "EXPENSE"
+            ? transaction.amount
+            : -transaction.amount;
+        acc[transaction.accountId] = (acc[transaction.accountId] || 0) + change;
+        return acc;
+      }, {});
+
+      // Delete transactions and update account balances in a transaction
+      await db.$transaction(async (tx) => {
+        // Delete transactions
+        await tx.transaction.deleteMany({
+          where: {
+            id: { in: transactionIds },
+            userId: user.id,
           },
         });
-      }
+
+        // Update account balances
+        for (const [accountId, balanceChange] of Object.entries(
+          accountBalanceChanges
+        )) {
+          await tx.account.update({
+            where: { id: accountId },
+            data: {
+              balance: {
+                increment: balanceChange,
+              },
+            },
+          });
+        }
+      });
+
+      revalidatePath("/dashboard");
+      revalidatePath("/account/[id]");
+
+      return { success: true };
     });
-
-    revalidatePath("/dashboard");
-    revalidatePath("/account/[id]");
-
-    return { success: true };
   } catch (error) {
-    return { success: false, error: error.message };
+    const dbError = handleDatabaseError(error);
+    return { success: false, error: dbError.message };
   }
 }
 
@@ -116,36 +126,39 @@ export async function updateDefaultAccount(accountId) {
     const session = await auth();
     if (!session?.user?.email) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
-      where: { email: session.user.email },
+    return await withDbConnection(async (db) => {
+      const user = await db.user.findUnique({
+        where: { email: session.user.email },
+      });
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      // First, unset any existing default account
+      await db.account.updateMany({
+        where: {
+          userId: user.id,
+          isDefault: true,
+        },
+        data: { isDefault: false },
+      });
+
+      // Then set the new default account
+      const account = await db.account.update({
+        where: {
+          id: accountId,
+          userId: user.id,
+        },
+        data: { isDefault: true },
+      });
+
+      revalidatePath("/dashboard");
+      return { success: true, data: serializeDecimal(account) };
     });
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    // First, unset any existing default account
-    await db.account.updateMany({
-      where: {
-        userId: user.id,
-        isDefault: true,
-      },
-      data: { isDefault: false },
-    });
-
-    // Then set the new default account
-    const account = await db.account.update({
-      where: {
-        id: accountId,
-        userId: user.id,
-      },
-      data: { isDefault: true },
-    });
-
-    revalidatePath("/dashboard");
-    return { success: true, data: serializeDecimal(account) }; // Corrected helper call
   } catch (error) {
-    return { success: false, error: error.message };
+    const dbError = handleDatabaseError(error);
+    return { success: false, error: dbError.message };
   }
 }
 
@@ -154,26 +167,28 @@ export async function getAccountDetails(accountId) {
     const session = await auth();
     if (!session?.user?.email) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
-      where: { email: session.user.email },
-    });
+    return await withDbConnection(async (db) => {
+      const user = await db.user.findUnique({
+        where: { email: session.user.email },
+      });
 
-    if (!user) throw new Error("User not found");
+      if (!user) throw new Error("User not found");
 
-    const account = await db.account.findUnique({
-      where: {
-        id: accountId,
-        userId: user.id,
-      },
-      include: {
-        _count: {
-          select: { transactions: true },
+      const account = await db.account.findUnique({
+        where: {
+          id: accountId,
+          userId: user.id,
         },
-      },
-    });
+        include: {
+          _count: {
+            select: { transactions: true },
+          },
+        },
+      });
 
-    if (!account) return null;
-    return serializeDecimal(account);
+      if (!account) return null;
+      return serializeDecimal(account);
+    });
   } catch (error) {
     console.error("Error getting account details:", error);
     return null;
@@ -185,21 +200,23 @@ export async function getAccountTransactions(accountId) {
     const session = await auth();
     if (!session?.user?.email) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
-      where: { email: session.user.email },
+    return await withDbConnection(async (db) => {
+      const user = await db.user.findUnique({
+        where: { email: session.user.email },
+      });
+
+      if (!user) throw new Error("User not found");
+
+      const transactions = await db.transaction.findMany({
+        where: {
+          accountId,
+          userId: user.id,
+        },
+        orderBy: { date: "desc" },
+      });
+
+      return transactions.map(serializeDecimal);
     });
-
-    if (!user) throw new Error("User not found");
-
-    const transactions = await db.transaction.findMany({
-      where: {
-        accountId,
-        userId: user.id,
-      },
-      orderBy: { date: "desc" },
-    });
-
-    return transactions.map(serializeDecimal);
   } catch (error) {
     console.error("Error getting account transactions:", error);
     return [];
