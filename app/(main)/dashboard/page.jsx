@@ -80,10 +80,13 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  const accounts = await getUserAccounts().catch(() => []);
+  const hasAccounts = accounts.length > 0;
+
   return (
     <div className="space-y-8">
       {/* Recruiter Developer Sandbox Console */}
-      <SandboxControls />
+      <SandboxControls hasAccounts={hasAccounts} />
       {/* Database Status */}
       <Suspense fallback={<div>Checking database connection...</div>}>
         <DatabaseStatus />

@@ -58,9 +58,9 @@ export function RecruiterSandboxGuide() {
     },
     {
       key: "step2",
-      title: "Step 2: Seed Sandbox",
-      subtitle: "Activate Recruiter Demo Mode",
-      desc: "Click the 'Activate Recruiter Demo Mode' button on the dashboard to dynamically provision checking accounts, budgets, and 90 days of transactions instantly.",
+      title: "Step 2: Load Demo Data",
+      subtitle: "Choose Guided Demo Mode",
+      desc: "On the dashboard onboarding screen, choose 'Guided Demo Mode' to instantly populate your dashboard with 90 days of transaction charts, roommate splits, and budgets.",
       icon: <Database className="h-6 w-6 text-emerald-400" />,
       actionText: "Open Dashboard",
       actionHref: "/dashboard",
@@ -69,7 +69,7 @@ export function RecruiterSandboxGuide() {
       key: "step3",
       title: "Step 3: Test Gemini OCR",
       subtitle: "AI Receipt Extraction",
-      desc: "Download our sample receipt and upload it in the 'Add Transaction' panel. Watch the Gemini 1.5 Flash AI extract items, merchant, and totals into input fields.",
+      desc: "Download our sample receipt and upload it in the 'Add Transaction' panel. Watch the Gemini 2.5 Flash AI extract items, merchant, and totals into input fields.",
       icon: <ScanLine className="h-6 w-6 text-orange-400" />,
       downloads: [
         { label: "Download PNG", href: "/sample-receipt.png" },
@@ -89,7 +89,7 @@ export function RecruiterSandboxGuide() {
       key: "step5",
       title: "Step 5: Test Serverless Crons",
       subtitle: "Automated Subscriptions",
-      desc: "Click the cron simulator in the dashboard sandbox console to trigger recurring transaction checks and generate monthly balance snapshots.",
+      desc: "Click 'Simulate Cron' in the dashboard testing toolbar to trigger recurring transaction checks and process subscription renewals automatically.",
       icon: <Calendar className="h-6 w-6 text-pink-400" />,
       actionText: "Trigger Simulator",
       actionHref: "/dashboard",
@@ -111,7 +111,7 @@ export function RecruiterSandboxGuide() {
           <div className="flex-1 space-y-2 text-center md:text-left">
             <h3 className="font-bold text-lg text-indigo-200">Reviewing my application?</h3>
             <p className="text-sm text-slate-300 leading-relaxed">
-              👋 Click <span className="font-semibold text-emerald-400">[Activate Recruiter Demo Mode]</span> on the dashboard to instantly seed your profile with 90 days of transactions, a default checking account, and active budget settings. This lets you test the interactive charts and analytics immediately without manual entry!
+              👋 Choose <span className="font-semibold text-emerald-400">[Guided Demo Mode]</span> on the dashboard to instantly populate your profile with 90 days of transactions, a default checking account, and active budget settings. This lets you test the interactive charts and analytics immediately without manual entry!
             </p>
           </div>
           <Link href="/dashboard">
@@ -126,7 +126,7 @@ export function RecruiterSandboxGuide() {
         <div className="text-center mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-400">
             <HelpCircle className="h-3.5 w-3.5 text-indigo-400" />
-            Recruiter Test-Drive Sandbox
+            Interactive Sandbox Walkthrough
           </div>
           <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
             Interactive Test-Drive Roadmap
