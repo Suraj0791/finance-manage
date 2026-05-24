@@ -35,9 +35,13 @@ const Header = async () => {
         <div className="hidden md:flex items-center space-x-8">
           {!isLoggedIn && (
             <>
-              <Link href="/playground" className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1">
+              <Link 
+                href="/playground" 
+                className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1"
+                title="Test AI receipt scanning, roommate bill splitting, and interactive charts instantly without logging in!"
+              >
                 <Sparkles className="h-4 w-4 animate-pulse" />
-                Try Interactive Sandbox
+                Try Live Demo (No Login)
               </Link>
               <a href="#features" className="text-gray-600 hover:text-blue-600">
                 Features

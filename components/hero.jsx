@@ -37,51 +37,23 @@ const HeroSection = () => {
           A modern, database-backed platform to track your checking accounts, automate subscription cycles, split group bills, and extract receipt data using Gemini AI.
         </p>
 
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-16 max-w-lg mx-auto">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-12 max-w-lg mx-auto">
           <Link href="/dashboard" className="w-full sm:w-auto">
             <Button size="lg" className="w-full px-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md py-6 h-12 rounded-xl">
-              Get Started
+              Get Started (Sign In)
             </Button>
           </Link>
-          <Link href="/playground" className="w-full sm:w-auto">
-            <Button size="lg" variant="outline" className="w-full px-8 border-indigo-250 hover:bg-indigo-50/50 text-indigo-600 font-semibold py-6 h-12 rounded-xl flex items-center justify-center gap-1.5">
-              <Sparkles className="h-4 w-4 animate-pulse" />
-              Try Sandbox (No Login)
-            </Button>
-          </Link>
-        </div>
-
-        {/* Informational Core Capabilities Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 text-left mb-16">
-          <div className="p-5 border border-slate-100 rounded-xl bg-slate-50/50 hover:shadow-sm transition-shadow">
-            <h4 className="font-bold text-slate-900 text-sm mb-1">🏦 Add Accounts</h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Create multiple checking or savings accounts manually to manage your balances.
-            </p>
-          </div>
-          <div className="p-5 border border-slate-100 rounded-xl bg-slate-50/50 hover:shadow-sm transition-shadow">
-            <h4 className="font-bold text-slate-900 text-sm mb-1">💸 Log Transactions</h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Add income and expenses, assign categories, and track where your money goes.
-            </p>
-          </div>
-          <div className="p-5 border border-slate-100 rounded-xl bg-slate-50/50 hover:shadow-sm transition-shadow">
-            <h4 className="font-bold text-slate-900 text-sm mb-1">🔄 Recurring Cycles</h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Schedule recurring subscription bills to charge and update balances automatically.
-            </p>
-          </div>
-          <div className="p-5 border border-slate-100 rounded-xl bg-slate-50/50 hover:shadow-sm transition-shadow">
-            <h4 className="font-bold text-slate-900 text-sm mb-1">🤖 AI Scanner</h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Upload a receipt image and let Gemini extract the merchant, amounts, and dates.
-            </p>
-          </div>
-          <div className="p-5 border border-slate-100 rounded-xl bg-slate-50/50 hover:shadow-sm transition-shadow">
-            <h4 className="font-bold text-slate-900 text-sm mb-1">👥 Split Bills</h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Create roommate groups. Settle balances using minimum-transaction algorithms.
-            </p>
+          <div className="relative group w-full sm:w-auto">
+            <Link href="/playground" className="w-full">
+              <Button size="lg" variant="outline" className="w-full px-8 border-indigo-250 hover:bg-indigo-50/50 text-indigo-600 font-semibold py-6 h-12 rounded-xl flex items-center justify-center gap-1.5">
+                <Sparkles className="h-4 w-4 animate-pulse" />
+                Try Live Demo (No Login)
+              </Button>
+            </Link>
+            {/* Absolute Hover Tooltip */}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-slate-900 border border-slate-800 text-slate-100 text-xs rounded-xl shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center leading-relaxed">
+              Test AI receipt scanning, roommate bill splitting, and interactive charts instantly without signing in!
+            </div>
           </div>
         </div>
 
