@@ -5,6 +5,8 @@ import { withDbConnection, handleDatabaseError } from "@/lib/db-wrapper";
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { headers } from "next/headers";
+import { rateLimit } from "@/lib/rate-limit";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -214,6 +216,13 @@ export async function getUserTransactions(query = {}) {
 // Scan Receipt
 export async function scanReceipt(file) {
   try {
+    // Apply custom rate limiting (e.g. 5 scans per 10 minutes per IP) to prevent API key abuse
+    const ip = (await headers()).get("x-forwarded-for") || "127.0.0.1";
+    const limitResult = await rateLimit(ip, "scan-receipt", 5, 600000);
+    if (!limitResult.success) {
+      throw new Error("Rate limit exceeded. Please wait a few minutes before scanning another receipt.");
+    }
+
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     // Convert File to ArrayBuffer

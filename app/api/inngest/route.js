@@ -1,19 +1,11 @@
-import { serve } from "inngest/next";
+// Inngest endpoint is deprecated. Standard serverless cron routing is handled in app/api/cron/route.js
+export async function GET() {
+  return new Response("Inngest endpoint is disabled.", { status: 410 });
+}
 
-import { inngest } from "@/lib/inngest/client";
-import {
-  checkBudgetAlerts,
-  generateMonthlyReports,
-  processRecurringTransaction,
-  triggerRecurringTransactions,
-} from "@/lib/inngest/function";
-
-export const { GET, POST, PUT } = serve({
-  client: inngest,
-  functions: [
-    processRecurringTransaction,
-    triggerRecurringTransactions,
-    generateMonthlyReports,
-    checkBudgetAlerts,
-  ],
-});
+export async function POST() {
+  return new Response("Inngest endpoint is disabled.", { status: 410 });
+}
+export async function PUT() {
+  return new Response("Inngest endpoint is disabled.", { status: 410 });
+}

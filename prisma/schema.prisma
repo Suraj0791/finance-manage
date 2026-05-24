@@ -292,3 +292,15 @@ enum InvitationStatus {
   REJECTED
   EXPIRED
 }
+
+model RateLimit {
+  id        String   @id @default(uuid())
+  ip        String
+  route     String
+  timestamp DateTime @default(now())
+
+  @@index([ip, route])
+  @@index([timestamp])
+  @@map("rate_limits")
+}
+
