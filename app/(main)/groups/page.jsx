@@ -1,4 +1,5 @@
 import { getUserGroups, getUserInvitations } from "@/actions/groups";
+import { OnboardingGuide } from "@/components/onboarding-guide";
 import { CreateGroupDialog } from "./_components/create-group-dialog";
 import { GroupCard } from "./_components/group-card";
 import { InvitationCard } from "./_components/invitation-card";
@@ -13,6 +14,16 @@ export default async function GroupsPage() {
 
   return (
     <div className="space-y-8">
+      <OnboardingGuide
+        storageKey="groups_dashboard"
+        title="Welcome to Shared Expense Groups!"
+        description="Shared Groups let you split bills with friends, family, or travel companions. You can allocate expenses equally, by exact amount, by percentages, or by share distributions. The app then runs a greedy graph-settlement algorithm to tell you who owes what to whom with the minimum number of transactions."
+        steps={[
+          "Select 'Roommates (Demo)' or click 'Create Group' to get started.",
+          "Add members (you can add friends with emails, or create dummy guest members).",
+          "Log expenses and click 'Record Payment' inside a group to settle up balances."
+        ]}
+      />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

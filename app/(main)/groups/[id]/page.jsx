@@ -1,4 +1,5 @@
 import { getGroupDetails, calculateGroupBalances } from "@/actions/groups";
+import { OnboardingGuide } from "@/components/onboarding-guide";
 import { getGroupExpenses } from "@/actions/expenses";
 import { auth } from "@/auth";
 import { GroupHeader } from "../_components/group-header";
@@ -47,6 +48,16 @@ export default async function GroupPage({ params }) {
 
     return (
       <div className="space-y-8">
+        <OnboardingGuide
+          storageKey="group_details"
+          title="Testing the Splitwise Calculator!"
+          description="This dashboard displays shared group bills and balances. Alice and Bob have been pre-seeded for you with demo expenses to show how the debt minimization calculations dynamically update when new receipts are logged."
+          steps={[
+            "View the 'Expense Overview' card to see who owes what.",
+            "Click 'Add Expense' to add a bill (e.g. food or travel) and split it among members.",
+            "Under 'Suggested Settlements', click 'Record Payment' to settle outstanding balances dynamically."
+          ]}
+        />
         {/* Group Header */}
         <GroupHeader group={groupDetails} currentUserId={currentUser?.id} />
 
