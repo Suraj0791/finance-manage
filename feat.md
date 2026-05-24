@@ -12,6 +12,9 @@ Welcome to the Technical Architecture Guide for the **Welth** personal finance m
 4. [PostgreSQL-Backed Rate Limiting](#4-postgresql-backed-rate-limiting)
 5. [Serverless Cron Jobs (Automations)](#5-serverless-cron-jobs-automations)
 6. [Interactive Dashboard & Charts](#6-interactive-dashboard--charts)
+7. [Interactive Debt Settlement Graph](#7-interactive-debt-settlement-graph)
+8. [Client-Side PDF Statement Generator](#8-client-side-pdf-statement-generator)
+9. [Gemini Function-Calling AI Financial Advisor](#9-gemini-function-calling-ai-financial-advisor)
 
 ---
 
@@ -384,3 +387,63 @@ Visual charts are crucial for understanding spending trends. We use **Recharts**
    - When users click **Save Transaction (Demo)** in the AI OCR auto-fill form preview:
      - The React state updates: `Expenses` for the current month increments by the receipt total.
      - The AreaChart detects this state change and smoothly animates the line upwards to show the added expense.
+
+---
+
+## 7. Interactive Debt Settlement Graph
+
+### Why We Use It
+
+Rather than just showing lists of text balances, a visual flow makes complex peer debts clear immediately. We designed a lightweight, interactive SVG network graph component that brings our greedy debt-minimization algorithm outputs to life without heavy external canvas dependencies.
+
+### The Graph Flow "Story"
+
+1. **Calculate Settlements**: When the user opens the group details page, the server runs `calculateGroupBalances`, applying a greedy minimization logic that matches the highest debtors to the highest creditors, reducing the transaction footprint.
+2. **Retrieve Coordinates**: On the client side, the visualizer maps the unique members in a circle. It automatically calculates the coordinate angle $\theta_i$ for each node:
+   - $X_i = CX + R \cdot \cos(\theta_i)$
+   - $Y_i = CY + R \cdot \sin(\theta_i)$
+3. **Draw Arcs (Directed Edges)**: The SVG draws curved paths using quadratic bezier formulas:
+   - `M x1 y1 Q qx qy x2 y2`
+   - Arrowheads are anchored on node borders using SVG `<marker>` tags.
+4. **Animate Cash Flow**: Small glowing SVG circles (`animateMotion`) loop along the bezier paths in the direction of the payments to represent the transaction stream.
+5. **Interactive Highlight**: Hovering over a node dims all other members and paths, emphasizing only the incoming/outgoing streams for that person. Tooltips display detailed values on hover.
+
+---
+
+## 8. Client-Side PDF Statement Generator
+
+### Why We Use It
+
+Mimicking actual banking and accounting suites, users need a way to export physical bank statements of their personal transactions and group settlement invoices. We use `jspdf` and `jspdf-autotable` to generate professional documents directly in the client browser.
+
+### The Exporter "Story"
+
+1. **User Triggers Export**: In the accounts page (under the filter bar) or the group details page, the user clicks the **Export** dropdown and selects "Export as PDF Statement".
+2. **Collect and Summarize Data**:
+   - **Personal Account**: The system reads the active filtered transactions and aggregates total income, total expenses, and net savings.
+   - **Shared Group**: The system maps the net balances of each member and compiles the minimized settlement steps.
+3. **Design Layout Grid**:
+   - Generates a styled header banner with purple branding (`#9333ea`).
+   - Draws a "Summary of Period" container with colored values.
+   - Triggers `doc.autoTable` to construct a clean tabular grid with alternating light-purple rows, page numbering, and color-coded green (income) vs red (expenses) transaction types.
+4. **Save File**: The generated PDF binary is compiled and downloaded instantly via the browser's download manager.
+
+---
+
+## 9. Gemini Function-Calling AI Financial Advisor
+
+### Why We Use It
+
+AI applications in 2026 demand context-aware capabilities. Rather than building static question-answer interfaces, we built a sidebar assistant powered by Google Gemini that safely and dynamically executes local database tools to answer specific queries about the user's accounts, budgets, and group splits.
+
+### The AI Agent "Story"
+
+1. **User Sends Query**: The user asks: *"Am I on track to meet my budget this month?"* in the sidebar assistant.
+2. **Analyze Intent (Gemini Route)**: The server API handler receives the message list and starts a chat session (`model.startChat`) loaded with a list of system tools:
+   - `getUserAccountOverview()`
+   - `getUserRecentTransactions(limit, category, startDate, endDate)`
+   - `getUserBudgetsAndSpending()`
+   - `getGroupSettlementReport(groupId)`
+3. **Identify Tool Requirement**: Gemini analyzes the user's message, identifies that it needs specific database parameters, and responds to the server with a request to execute `getUserBudgetsAndSpending()`.
+4. **Local Secure Execution**: The server intercepts the tool call, fetches the session user's ID via NextAuth `auth()`, and executes the query strictly scoped to that ID (`userId: user.id`).
+5. **Formulate Final Response**: The server sends the query results back to Gemini. Gemini digests the numbers and replies to the user in natural language: *"You have spent $450 of your $1,200 budget. You are on track!"*

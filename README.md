@@ -19,6 +19,8 @@ https://ai-finance-manage.vercel.app/
 
 - **Interactive Dashboard**: Visualize transactions and financial data using bar graphs and pie charts
 - **AI Receipt Scanning**: Scan receipts using the AI Gemini API to automatically generate new transactions
+- **AI Financial Advisor Chatbot**: Chat with an AI assistant that securely queries your bank accounts, budgets, and transactions in real-time using Gemini function calling
+- **Statement PDF/CSV Exports**: Generate and download professional, styled bank-statement PDFs or raw CSV lists of your transactions
 - **Multiple Account Support**: Manage multiple bank accounts and credit cards in one place
 - **Transaction Analysis**: Comprehensive categorized transaction tracking and analysis
 - **Smart Budgeting**: Set monthly budgets with email notifications when limits are approached
@@ -29,6 +31,8 @@ https://ai-finance-manage.vercel.app/
 ### 👥 Splitwise Clone Features
 
 - **Group Management**: Create and manage expense-sharing groups with friends and family
+- **Debt Settlement Visualizer**: Interactive network flow graph representing simplified member balances, curvature paths, and glowing particle cash-flow animations based on greedy minimization output
+- **Group Statement PDF Export**: Export group balances and settlement summaries directly as a styled PDF report
 - **Email Invitations**: Secure invitation system to add new members via email
 - **Flexible Expense Splitting**:
   - Equal splits among all members

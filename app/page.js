@@ -156,6 +156,63 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+
+            {/* Feature 6: AI Chat Advisor */}
+            <div className="p-8 border border-slate-200/60 bg-white rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between space-y-6 group">
+              <div className="space-y-4">
+                <div className="text-3xl">💬</div>
+                <h3 className="text-xl font-bold text-slate-950">AI Chat Advisor</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Interact with a smart conversational AI assistant that directly queries your financial records.
+                </p>
+                <div className="space-y-2 border-t border-slate-100 pt-4 text-xs">
+                  <div>
+                    <span className="font-semibold text-slate-900">What you can do:</span> Ask questions like "Am I on track to meet my budget?" or "Show my recent grocery transactions" to get instant, context-aware answers.
+                  </div>
+                  <div>
+                    <span className="font-semibold text-blue-650">Why use it:</span> Uses secure Gemini tool calling to run safe SQL queries restricted strictly to your account data.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 7: Interactive Money Flow Graph */}
+            <div className="p-8 border border-slate-200/60 bg-white rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between space-y-6 group">
+              <div className="space-y-4">
+                <div className="text-3xl">🕸️</div>
+                <h3 className="text-xl font-bold text-slate-950">Visual Debt Settlement</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  See debt minimization results mapped out visually with our dynamic, interactive network graph.
+                </p>
+                <div className="space-y-2 border-t border-slate-100 pt-4 text-xs">
+                  <div>
+                    <span className="font-semibold text-slate-900">What you can do:</span> Toggle to 'Interactive Graph' inside a group to inspect payment directions, hover over members to highlight connections, and watch particle money flow.
+                  </div>
+                  <div>
+                    <span className="font-semibold text-blue-650">Why use it:</span> Brings the greedy minimization algorithm to life visually, making it easy to understand complex splits.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 8: Professional Exporters */}
+            <div className="p-8 border border-slate-200/60 bg-white rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between space-y-6 group">
+              <div className="space-y-4">
+                <div className="text-3xl">📄</div>
+                <h3 className="text-xl font-bold text-slate-950">Statement PDF/CSV Exports</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Download personal account records and group split summaries as clean PDF sheets or CSV spreadsheets.
+                </p>
+                <div className="space-y-2 border-t border-slate-100 pt-4 text-xs">
+                  <div>
+                    <span className="font-semibold text-slate-900">What you can do:</span> Generate banking-style transaction statements or shared expense settlement invoices with a single click.
+                  </div>
+                  <div>
+                    <span className="font-semibold text-blue-650">Why use it:</span> Mimics accounting software utility for easy physical records or tax preparation.
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
