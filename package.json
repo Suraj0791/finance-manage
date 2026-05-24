@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "eslint": "^8",
-    "eslint-config-next": "15.0.3",
+    "eslint-config-next": "^15.1.7",
     "postcss": "^8",
     "prisma": "^6.8.2",
     "react-email": "3.0.3",
