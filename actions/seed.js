@@ -116,13 +116,13 @@ export async function seedTransactions() {
 
     // 5. Create default Splitwise group for demo splits
     let group = await db.group.findFirst({
-      where: { createdById: user.id, name: "Roommates (Demo)" },
+      where: { createdById: user.id, name: "Friends (Demo)" },
     });
 
     if (!group) {
       group = await db.group.create({
         data: {
-          name: "Roommates (Demo)",
+          name: "Friends (Demo)",
           description: "Demo group to test bill splits and debt simplification.",
           createdById: user.id,
           members: {
@@ -208,7 +208,7 @@ export async function seedTransactions() {
 
     return {
       success: true,
-      message: `Database populated: Created checking account, $4,000 monthly budget, "Roommates (Demo)" Splitwise group, and ${transactions.length} mock transactions successfully.`,
+      message: `Database populated: Created checking account, $4,000 monthly budget, "Friends (Demo)" Splitwise group, and ${transactions.length} mock transactions successfully.`,
     };
   } catch (error) {
     console.error("Error seeding transactions:", error);

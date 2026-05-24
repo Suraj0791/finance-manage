@@ -119,13 +119,13 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Feature 4: Roommate Splits */}
+            {/* Feature 4: Group & Friends Splits */}
             <div className="p-8 border border-slate-200/60 bg-white rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between space-y-6 group">
               <div className="space-y-4">
                 <div className="text-3xl">👥</div>
-                <h3 className="text-xl font-bold text-slate-950">Roommate Bill Splits</h3>
+                <h3 className="text-xl font-bold text-slate-950">Group & Friends Bill Splits</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  Share rent, travel bills, or groceries with friends, roommates, or travel groups.
+                  Share travel bills, dinner tabs, rent, or groceries with friends, roommates, or travel groups.
                 </p>
                 <div className="space-y-2 border-t border-slate-100 pt-4 text-xs">
                   <div>

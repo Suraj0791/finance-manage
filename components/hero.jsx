@@ -52,7 +52,7 @@ const HeroSection = () => {
             </Link>
             {/* Absolute Hover Tooltip */}
             <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-slate-900 border border-slate-800 text-slate-100 text-xs rounded-xl shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center leading-relaxed">
-              Test AI receipt scanning, roommate bill splitting, and interactive charts instantly without signing in!
+              Test AI receipt scanning, group bill splitting, and interactive charts instantly without signing in!
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@ const HeroSection = () => {
           </div>
           <p className="text-xs text-blue-900 leading-relaxed">
             To see interactive charts, budget limits, and bill-splitting algorithms in action, manual data entry would require weeks of input. 
-            We <strong>highly recommend</strong> logging in and clicking <strong>"Explore with Demo Data"</strong>. This instantly populates your private dashboard with 90 days of transactions, budgets, and roommate groups so you can test all features in 10 seconds without any tedious data entry.
+            We <strong>highly recommend</strong> logging in and clicking <strong>"Explore with Demo Data"</strong>. This instantly populates your private dashboard with 90 days of transactions, budgets, and friends groups so you can test all features in 10 seconds without any tedious data entry.
           </p>
         </div>
       </div>

@@ -38,7 +38,7 @@ const Header = async () => {
               <Link 
                 href="/playground" 
                 className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1"
-                title="Test AI receipt scanning, roommate bill splitting, and interactive charts instantly without logging in!"
+                title="Test AI receipt scanning, group bill splitting, and interactive charts instantly without logging in!"
               >
                 <Sparkles className="h-4 w-4 animate-pulse" />
                 Try Live Demo (No Login)

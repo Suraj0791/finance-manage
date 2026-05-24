@@ -251,7 +251,7 @@ export default function PlaygroundPage() {
             Interactive AI & Algo Playground
           </h1>
           <p className="text-slate-400 text-base leading-relaxed">
-            👋 Welcome! You can use this sandbox to test our core algorithms and Gemini AI OCR scanner instantly, completely without authenticating or setting up an account.
+            👋 Welcome! Test our core algorithms and Gemini AI OCR scanner instantly below. No signup, login, or real bank connection required!
           </p>
         </div>
 
@@ -300,19 +300,40 @@ export default function PlaygroundPage() {
 
         {/* --- OCR TAB CONTENT --- */}
         {activeTab === "ocr" && (
-          <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
-            {/* Left Upload Panel */}
-            <Card className="bg-slate-900/60 border-slate-800 text-slate-100 flex flex-col justify-between p-6">
-              <div className="space-y-4">
+          <div className="space-y-6 max-w-5xl mx-auto">
+            {/* Feature Explanation Banner */}
+            <Card className="relative overflow-hidden bg-slate-900/40 border-slate-800 p-5 rounded-2xl">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-xl pointer-events-none"></div>
+              <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold flex items-center gap-2 text-slate-200">
-                    <Camera className="h-5 w-5 text-indigo-400" />
-                    AI Receipt OCR Scanner
-                  </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Upload any paper purchase receipt image to test the Gemini 2.5 Flash extraction capability. It reads the image, identifies items, merchants, categories, and totals.
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full">Gemini 2.5 Flash AI</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-200">What is Gemini OCR?</h3>
+                  <p className="text-xs text-slate-350 leading-relaxed max-w-3xl">
+                    This scanner instantly reads any paper bill or receipt image and <strong className="text-indigo-300">automatically pre-fills the transaction form</strong>. There is absolutely no need to write down merchant names, dates, categories, or amounts manually every time! Just upload your bill, chill out, and watch the AI extract all details instantly.
                   </p>
                 </div>
+                <div className="flex items-center gap-2 text-xs text-indigo-400 font-semibold bg-indigo-950/40 px-3 py-1.5 rounded-xl border border-indigo-900/50">
+                  <Sparkles className="h-4.5 w-4.5 animate-pulse" />
+                  1-Click AI Auto-Fill
+                </div>
+              </div>
+            </Card>
+
+            <div className="grid gap-8 md:grid-cols-2">
+              {/* Left Upload Panel */}
+              <Card className="bg-slate-900/60 border-slate-800 text-slate-100 flex flex-col justify-between p-6">
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold flex items-center gap-2 text-slate-200">
+                      <Camera className="h-5 w-5 text-indigo-400" />
+                      AI Receipt OCR Scanner
+                    </h3>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Upload any paper bill or receipt image below to test the AI extractor.
+                    </p>
+                  </div>
 
                 {/* Download Sample receipts */}
                 <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2 text-xs">
@@ -431,19 +452,40 @@ export default function PlaygroundPage() {
 
         {/* --- BILL SPLIT SOLVER TAB CONTENT --- */}
         {activeTab === "split" && (
-          <div className="grid gap-8 md:grid-cols-3 max-w-6xl mx-auto">
-            {/* Column 1: Members */}
-            <Card className="bg-slate-900/60 border-slate-800 text-slate-100 p-5 flex flex-col justify-between">
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-bold text-slate-200 flex items-center gap-2">
-                    <Users className="h-4 w-4 text-indigo-400" />
-                    1. Group Members
-                  </h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    Add or remove roommates in the current calculation.
+          <div className="space-y-6 max-w-6xl mx-auto">
+            {/* Feature Explanation Banner */}
+            <Card className="relative overflow-hidden bg-slate-900/40 border-slate-800 p-5 rounded-2xl">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-xl pointer-events-none"></div>
+              <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full">Algorithm Solver</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-200">What is Bill Simplification?</h3>
+                  <p className="text-xs text-slate-350 leading-relaxed max-w-3xl">
+                    Easily split bills and group expenses among your friends—that's all! Just enter who is in your group and log whatever expenses were paid by different people. Our <strong className="text-emerald-300">greedy debt-simplification algorithm</strong> automatically calculates everyone's share and outputs the exact, optimized list of who needs to pay whom, minimizing the total number of transactions. No messy math or endless transfers required!
                   </p>
                 </div>
+                <div className="flex items-center gap-2 text-xs text-emerald-400 font-semibold bg-emerald-950/40 px-3 py-1.5 rounded-xl border border-emerald-900/50">
+                  <Users className="h-4.5 w-4.5" />
+                  Simplified Settlements
+                </div>
+              </div>
+            </Card>
+
+            <div className="grid gap-8 md:grid-cols-3">
+              {/* Column 1: Members */}
+              <Card className="bg-slate-900/60 border-slate-800 text-slate-100 p-5 flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-bold text-slate-200 flex items-center gap-2">
+                      <Users className="h-4 w-4 text-indigo-400" />
+                      1. Group Members
+                    </h4>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      Add or remove friends in the current calculation.
+                    </p>
+                  </div>
 
                 <div className="flex gap-2">
                   <Input
@@ -541,7 +583,7 @@ export default function PlaygroundPage() {
                     3. Greedy Debt Simplifier
                   </h4>
                   <p className="text-[11px] text-slate-400 mt-0.5">
-                    Minimal transaction paths to clear roommate balances.
+                    Minimal transaction paths to clear friends' balances.
                   </p>
                 </div>
 
@@ -578,15 +620,36 @@ export default function PlaygroundPage() {
 
         {/* --- CHARTS TAB CONTENT --- */}
         {activeTab === "charts" && mounted && (
-          <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
-            {/* Left Controls */}
-            <Card className="bg-slate-900/60 border-slate-800 text-slate-100 p-5 space-y-4 md:col-span-1">
-              <div>
-                <h4 className="font-bold text-slate-200">Interactive Analytics</h4>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Select a spending scenario below to simulate how the area and categorization charts dynamically render changes.
-                </p>
+          <div className="space-y-6 max-w-5xl mx-auto">
+            {/* Feature Explanation Banner */}
+            <Card className="relative overflow-hidden bg-slate-900/40 border-slate-800 p-5 rounded-2xl">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-xl pointer-events-none"></div>
+              <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full">Interactive Analytics</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-200">What are Interactive Charts?</h3>
+                  <p className="text-xs text-slate-350 leading-relaxed max-w-3xl">
+                    These interactive charts visualize your income vs. expense breakdown in real-time. Try toggling between different financial profiles (like a typical budget, a high vacation expense spike, or an aggressive saving month) to watch the <strong className="text-amber-300">animated graphs automatically recalculate and redraw</strong>. This simulates how the app behaves when logging different spending habits.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-amber-400 font-semibold bg-amber-950/40 px-3 py-1.5 rounded-xl border border-amber-900/50">
+                  <TrendingUp className="h-4.5 w-4.5" />
+                  Dynamic Visualization
+                </div>
               </div>
+            </Card>
+
+            <div className="grid gap-8 md:grid-cols-3">
+              {/* Left Controls */}
+              <Card className="bg-slate-900/60 border-slate-800 text-slate-100 p-5 space-y-4 md:col-span-1">
+                <div>
+                  <h4 className="font-bold text-slate-200">Interactive Analytics</h4>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Select a spending scenario below to simulate how the area and categorization charts dynamically render changes.
+                  </p>
+                </div>
 
               <div className="space-y-2 pt-2">
                 <Button
@@ -648,7 +711,8 @@ export default function PlaygroundPage() {
               </div>
             </Card>
           </div>
-        )}
+        </div>
+      )}
       </div>
     </div>
   );

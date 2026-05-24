@@ -19,7 +19,7 @@ export default async function GroupsPage() {
         title="Welcome to Shared Expense Groups!"
         description="Shared Groups let you split bills with friends, family, or travel companions. You can allocate expenses equally, by exact amount, by percentages, or by share distributions. The app then runs a greedy graph-settlement algorithm to tell you who owes what to whom with the minimum number of transactions."
         steps={[
-          "Select 'Roommates (Demo)' or click 'Create Group' to get started.",
+          "Select 'Friends (Demo)' or click 'Create Group' to get started.",
           "Add members (you can add friends with emails, or create dummy guest members).",
           "Log expenses and click 'Record Payment' inside a group to settle up balances."
         ]}

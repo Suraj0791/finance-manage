@@ -89,7 +89,7 @@ export function SandboxControls({ hasAccounts }) {
                   Option A: Guided Demo Mode
                 </h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Instantly populate your account with **90 days of realistic sample transactions**, a pre-configured monthly budget threshold, and a pre-seeded **Splitwise roommates group** to test charts, budgets, and bill splitting immediately.
+                  Instantly populate your account with **90 days of realistic sample transactions**, a pre-configured monthly budget threshold, and a pre-seeded **Splitwise friends group** to test charts, budgets, and bill splitting immediately.
                 </p>
               </div>
               <Button
