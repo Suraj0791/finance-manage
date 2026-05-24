@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 // Simple API health check that doesn't depend on database connection
 export async function GET() {
   try {

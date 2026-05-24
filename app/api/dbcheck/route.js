@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 // Force Node.js runtime to ensure Prisma works and avoid Edge serialization quirks
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 // This API route is a safer version of the ping endpoint that handles errors better
 export async function GET() {

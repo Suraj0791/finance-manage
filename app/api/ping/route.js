@@ -3,6 +3,7 @@ import { pingDatabase } from "@/lib/prisma";
 
 // Ensure Node.js runtime for Prisma compatibility
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 // Simple API endpoint that's guaranteed to return a valid response
 export async function GET() {
