@@ -57,7 +57,7 @@ class ErrorBoundary extends React.Component {
             <CardContent className="space-y-4">
               <p className="text-muted-foreground text-center">
                 {isDbError
-                  ? "The application is having trouble connecting to the database. This may be due to the Supabase free tier limitations."
+                  ? "The application is having trouble connecting to the database. This may be due to a Neon Serverless cold start. Please try refreshing in a few moments."
                   : "An unexpected error occurred in the application."}
               </p>
 

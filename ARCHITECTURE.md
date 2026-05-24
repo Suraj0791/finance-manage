@@ -9,11 +9,11 @@ This document provides an overview of the finance management app's architecture 
 - **User Management**: Handles user registration, login, and profile management
 - **Integration**: Integrated with the database through `checkUser.js` to sync user data
 
-### Database Layer (Supabase PostgreSQL)
+### Database Layer (Neon Serverless PostgreSQL)
 
 - **ORM**: Prisma is used for database operations
 - **Models**: Users, Accounts, Transactions, Budgets
-- **Connection Management**: Enhanced handling for Supabase free tier with retry logic
+- **Connection Management**: Enhanced handling for Neon Serverless autosuspend with retry logic
 
 ### Server Actions (Next.js)
 
@@ -57,7 +57,7 @@ This document provides an overview of the finance management app's architecture 
 
 ## Database Health Management
 
-The app includes special handling for Supabase free tier database:
+The app includes special handling for Neon Serverless database:
 
 1. **Connection Monitoring**:
 

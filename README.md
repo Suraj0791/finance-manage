@@ -1,6 +1,6 @@
 # AI Finance Management App
 
-A comprehensive financial management application built with Next.js, Supabase PostgreSQL, Clerk authentication, and Prisma ORM. The application includes personal finance tracking, budgeting tools, transaction analysis, and database health monitoring for Supabase free tier.
+A comprehensive financial management application built with Next.js, Neon Serverless PostgreSQL, Auth.js (NextAuth) authentication, and Prisma ORM. The application includes personal finance tracking, budgeting tools, transaction analysis, and database health monitoring for Neon Serverless autosuspend.
 
 ## Live Application
 
@@ -85,8 +85,8 @@ https://ai-finance-manage.vercel.app/
 ### Backend & Database
 
 - **Prisma**: Type-safe database ORM with automatic migrations
-- **Supabase**: PostgreSQL database with real-time subscriptions
-- **Enhanced Connection Handling**: Custom retry logic for Supabase free tier
+- **Neon Serverless**: Serverless PostgreSQL database host
+- **Enhanced Connection Handling**: Custom retry logic for Neon Serverless autosuspend
 - **Database Health Monitoring**: Automatic wake-up and status tracking
 
 ### Authentication & Security
@@ -115,8 +115,8 @@ https://ai-finance-manage.vercel.app/
 ### Prerequisites
 
 - Node.js 18+ installed on your machine
-- A Supabase account and project
-- A Clerk account for authentication
+- A Neon account and project
+- A Google/GitHub developer account for authentication
 - Google AI API key for receipt scanning
 - Resend account for email notifications
 
@@ -139,7 +139,7 @@ Create a `.env.local` file in the root directory with the following variables:
 
 ```env
 # Database
-DATABASE_URL="your_supabase_connection_string"
+DATABASE_URL="your_neon_connection_string"
 
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your_clerk_publishable_key"
@@ -191,12 +191,11 @@ npm start
 
 ## 🔧 Configuration
 
-### Supabase Setup
+### Neon Setup
 
-1. Create a new Supabase project
-2. Copy the connection string from Settings > Database
-3. Enable Row Level Security (RLS) for enhanced security
-4. The app includes automatic database wake-up for free tier limitations
+1. Create a new Neon project
+2. Copy the connection string from Settings > Connection Details
+3. The app includes automatic database retry logic for serverless autosuspend (cold starts)
 
 ### Clerk Setup
 
@@ -254,36 +253,28 @@ GEMINI_API_KEY=
 
 5. Open the app in your browser at [http://localhost:3000](http://localhost:3000).
 
-## 🗄️ Database Management & Supabase Free Tier
+## 🗄️ Database Management & Neon Serverless Autosuspend
 
-### Handling Database Pausing
+### Handling Database Cold Starts
 
-This application includes robust handling for Supabase free tier database pausing:
+This application includes robust handling for Neon Serverless autosuspend and cold starts:
 
-- **Automatic Detection**: The app detects when the database is paused due to 7 days of inactivity
-- **Wake-Up Functionality**: Built-in database wake-up feature with progress tracking
-- **Connection Retry Logic**: Automatic retry with exponential backoff for failed connections
-- **User-Friendly Errors**: Clear error messages explaining the free tier limitations
+- **Automatic Detection**: The app detects when the database is waking up from autosuspend
+- **Wake-Up Retry**: Built-in database retry logic with progress logging during cold starts
+- **Connection Retry Logic**: Automatic retry with exponential backoff for failed connection attempts
 - **Health Monitoring**: Real-time database status monitoring on the dashboard
 
-### Why Database Pausing Happens
+### Why Autosuspend Happens
 
-- Supabase free tier automatically pauses databases after 7 days of inactivity
-- This is a cost-saving and resource management measure
-- Your data is safe and the database will resume when accessed
-- Common error: Prisma P1001 "Can't reach database server"
-
-### Preventing Database Pausing
-
-1. **GitHub Actions Workflow**: Included workflow pings the database every 6 days
-2. **Health Check Endpoints**: `/api/health` and `/api/ping` for monitoring
-3. **Manual Wake-Up**: Users can manually wake up the database through the UI
+- Neon Serverless free tier automatically suspends the database compute instance after 5 minutes of inactivity to conserve resources
+- When a new request arrives, Neon automatically wakes up (cold start), which takes about 0.5 to 3 seconds
+- The application automatically retries queries during this brief wake-up window to prevent UI errors
 
 ### Connection String Optimizations
 
 ```env
-# Enhanced connection string with timeouts for Supabase free tier
-DATABASE_URL="postgresql://user:pass@host:6543/postgres?pgbouncer=true&connect_timeout=60&pool_timeout=60"
+# Standard Neon connection string (ensure pooled connection or direct url is set accordingly)
+DATABASE_URL="postgresql://user:pass@host/neondb?sslmode=require"
 ```
 
 ## 🚀 Deployment

@@ -18,12 +18,12 @@ export const getDbStatus = withDbConnection(async () => {
   }
 });
 
-export async function isSupabaseAwake() {
+export async function isNeonDatabaseAwake() {
   try {
     const status = await getDbStatus();
     return status.status === "connected";
   } catch (error) {
-    console.error("Supabase status check failed:", error);
+    console.error("Neon database status check failed:", error);
     return false;
   }
 }

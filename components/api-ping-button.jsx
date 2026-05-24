@@ -99,8 +99,7 @@ const ApiPingButton = () => {
 
           <div className="text-xs text-gray-500 mt-2">
             <p>
-              If your Supabase database is on the free tier, it may be paused
-              after 7 days of inactivity. This button will help wake it up.
+              Neon Serverless Postgres databases autosuspend after inactivity on the free tier. This button pings the database to trigger an instant cold start wake-up.
             </p>
           </div>
         </div>
