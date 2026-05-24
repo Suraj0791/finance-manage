@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
-import { db } from "@/lib/prisma";
+import { withDbConnection } from "@/lib/db-wrapper";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -22,21 +22,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (!user.email) return false;
 
       try {
-        // Sync user with our database
-        const existingUser = await db.user.findUnique({
-          where: { email: user.email },
+        // Sync user with our database using retry wrapper
+        const dbUser = await withDbConnection(async (prisma) => {
+          let existingUser = await prisma.user.findUnique({
+            where: { email: user.email },
+          });
+
+          if (!existingUser) {
+            existingUser = await prisma.user.create({
+              data: {
+                email: user.email,
+                name: user.name || "User",
+                imageUrl: user.image || "",
+              },
+            });
+          }
+          return existingUser;
         });
 
-        if (!existingUser) {
-          await db.user.create({
-            data: {
-              email: user.email,
-              name: user.name || "User",
-              imageUrl: user.image || "",
-            },
-          });
-        }
-        return true;
+        return !!dbUser;
       } catch (error) {
         console.error("Error syncing user during sign in:", error);
         return false;
@@ -44,11 +48,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async jwt({ token, user }) {
       if (user) {
-        // First-time load: append DB user id to token
+        // First-time load: append DB user id to token using retry wrapper
         try {
-          const dbUser = await db.user.findUnique({
-            where: { email: user.email },
-            select: { id: true },
+          const dbUser = await withDbConnection(async (prisma) => {
+            return await prisma.user.findUnique({
+              where: { email: user.email },
+              select: { id: true },
+            });
           });
           if (dbUser) {
             token.userId = dbUser.id;
