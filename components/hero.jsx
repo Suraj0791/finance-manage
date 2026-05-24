@@ -33,8 +33,8 @@ const HeroSection = () => {
         <h1 className="text-5xl md:text-8xl lg:text-[100px] pb-6 gradient-title">
           Manage Your Finances <br /> with Intelligence
         </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-          A modern, database-backed platform to track your checking accounts, automate subscription cycles, split group bills, and extract receipt data using Gemini AI.
+        <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed">
+          An enterprise-grade, fully database-backed wealth platform built with <strong>Next.js</strong>, <strong>Prisma ORM</strong>, and <strong>Neon Serverless PostgreSQL</strong>. Persist checking accounts, automate backend cron jobs, split group bills with optimized graph reductions, and run Gemini AI OCR receipt extractions—all fully integrated with production-level persistence.
         </p>
 
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-12 max-w-lg mx-auto">

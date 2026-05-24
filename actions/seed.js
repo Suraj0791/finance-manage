@@ -77,35 +77,202 @@ export async function seedTransactions() {
       });
     }
 
-    // 3. Generate 90 days of transactions for this account
+    // 3. Generate 90 days of structured, realistic transactions
     const transactions = [];
     let totalBalance = 0;
 
-    for (let i = 90; i >= 0; i--) {
-      const date = subDays(new Date(), i);
-      const transactionsPerDay = Math.floor(Math.random() * 2) + 1; // 1 to 2 transactions per day
+    const seedMonthlyPattern = (startDay, endDay) => {
+      // Income: Salary on day (startDay - 1)
+      const salaryDate = subDays(new Date(), startDay - 1);
+      const salaryAmount = getRandomAmount(5000, 5200);
+      transactions.push({
+        id: crypto.randomUUID(),
+        type: "INCOME",
+        amount: salaryAmount,
+        description: "Monthly Salary Payment",
+        date: salaryDate,
+        category: "salary",
+        status: "COMPLETED",
+        userId: user.id,
+        accountId: account.id,
+        createdAt: salaryDate,
+        updatedAt: salaryDate,
+      });
+      totalBalance += salaryAmount;
 
-      for (let j = 0; j < transactionsPerDay; j++) {
-        const type = Math.random() < 0.3 ? "INCOME" : "EXPENSE"; // 30% income, 70% expenses
-        const { category, amount } = getRandomCategory(type);
+      // Freelance / dividend income
+      const freelanceDate = subDays(new Date(), startDay - 15);
+      const freelanceAmount = getRandomAmount(400, 600);
+      transactions.push({
+        id: crypto.randomUUID(),
+        type: "INCOME",
+        amount: freelanceAmount,
+        description: "Freelance Software Consulting",
+        date: freelanceDate,
+        category: "freelance",
+        status: "COMPLETED",
+        userId: user.id,
+        accountId: account.id,
+        createdAt: freelanceDate,
+        updatedAt: freelanceDate,
+      });
+      totalBalance += freelanceAmount;
 
+      // Expenses: Rent on day (startDay - 2)
+      const rentDate = subDays(new Date(), startDay - 2);
+      const rentAmount = 1500;
+      transactions.push({
+        id: crypto.randomUUID(),
+        type: "EXPENSE",
+        amount: rentAmount,
+        description: "Apartment Rental Payment",
+        date: rentDate,
+        category: "housing",
+        status: "COMPLETED",
+        userId: user.id,
+        accountId: account.id,
+        createdAt: rentDate,
+        updatedAt: rentDate,
+      });
+      totalBalance -= rentAmount;
+
+      // Utilities on day (startDay - 5)
+      const utilitiesDate = subDays(new Date(), startDay - 5);
+      const utilitiesAmount = getRandomAmount(160, 220);
+      transactions.push({
+        id: crypto.randomUUID(),
+        type: "EXPENSE",
+        amount: utilitiesAmount,
+        description: "Electric & Water Utilities",
+        date: utilitiesDate,
+        category: "utilities",
+        status: "COMPLETED",
+        userId: user.id,
+        accountId: account.id,
+        createdAt: utilitiesDate,
+        updatedAt: utilitiesDate,
+      });
+      totalBalance -= utilitiesAmount;
+
+      // Groceries: 4 times throughout the 30-day block
+      for (let g = 0; g < 4; g++) {
+        const offset = Math.floor(g * 7.5) + 3;
+        const targetDay = startDay - offset;
+        if (targetDay < endDay) continue;
+        const grocDate = subDays(new Date(), targetDay);
+        const grocAmount = getRandomAmount(80, 130);
         transactions.push({
           id: crypto.randomUUID(),
-          type,
-          amount,
-          description: `${type === "INCOME" ? "Received" : "Paid for"} ${category}`,
-          date,
-          category,
+          type: "EXPENSE",
+          amount: grocAmount,
+          description: "Supermarket Groceries Purchase",
+          date: grocDate,
+          category: "groceries",
           status: "COMPLETED",
           userId: user.id,
           accountId: account.id,
-          createdAt: date,
-          updatedAt: date,
+          createdAt: grocDate,
+          updatedAt: grocDate,
         });
-
-        totalBalance += type === "INCOME" ? amount : -amount;
+        totalBalance -= grocAmount;
       }
-    }
+
+      // Transportation: 6 times
+      for (let t = 0; t < 6; t++) {
+        const offset = Math.floor(t * 5) + 4;
+        const targetDay = startDay - offset;
+        if (targetDay < endDay) continue;
+        const transDate = subDays(new Date(), targetDay);
+        const transAmount = getRandomAmount(20, 50);
+        transactions.push({
+          id: crypto.randomUUID(),
+          type: "EXPENSE",
+          amount: transAmount,
+          description: "Uber Rides & Public Transit",
+          date: transDate,
+          category: "transportation",
+          status: "COMPLETED",
+          userId: user.id,
+          accountId: account.id,
+          createdAt: transDate,
+          updatedAt: transDate,
+        });
+        totalBalance -= transAmount;
+      }
+
+      // Food / Restaurants: 5 times
+      for (let f = 0; f < 5; f++) {
+        const offset = Math.floor(f * 6) + 2;
+        const targetDay = startDay - offset;
+        if (targetDay < endDay) continue;
+        const foodDate = subDays(new Date(), targetDay);
+        const foodAmount = getRandomAmount(35, 80);
+        transactions.push({
+          id: crypto.randomUUID(),
+          type: "EXPENSE",
+          amount: foodAmount,
+          description: "Dinner Out & Cafes",
+          date: foodDate,
+          category: "food",
+          status: "COMPLETED",
+          userId: user.id,
+          accountId: account.id,
+          createdAt: foodDate,
+          updatedAt: foodDate,
+        });
+        totalBalance -= foodAmount;
+      }
+
+      // Shopping: 2 times
+      for (let s = 0; s < 2; s++) {
+        const offset = Math.floor(s * 15) + 6;
+        const targetDay = startDay - offset;
+        if (targetDay < endDay) continue;
+        const shopDate = subDays(new Date(), targetDay);
+        const shopAmount = getRandomAmount(60, 160);
+        transactions.push({
+          id: crypto.randomUUID(),
+          type: "EXPENSE",
+          amount: shopAmount,
+          description: "Online Shopping Retail",
+          date: shopDate,
+          category: "shopping",
+          status: "COMPLETED",
+          userId: user.id,
+          accountId: account.id,
+          createdAt: shopDate,
+          updatedAt: shopDate,
+        });
+        totalBalance -= shopAmount;
+      }
+
+      // Travel/Leisure: 1 time
+      const travelOffset = 18;
+      const travelDay = startDay - travelOffset;
+      if (travelDay >= endDay) {
+        const travelDate = subDays(new Date(), travelDay);
+        const travelAmount = getRandomAmount(350, 600);
+        transactions.push({
+          id: crypto.randomUUID(),
+          type: "EXPENSE",
+          amount: travelAmount,
+          description: "Weekend Trip Booking",
+          date: travelDate,
+          category: "travel",
+          status: "COMPLETED",
+          userId: user.id,
+          accountId: account.id,
+          createdAt: travelDate,
+          updatedAt: travelDate,
+        });
+        totalBalance -= travelAmount;
+      }
+    };
+
+    // Run the structured seeding pattern for the last 3 months
+    seedMonthlyPattern(90, 60);
+    seedMonthlyPattern(60, 30);
+    seedMonthlyPattern(30, 0);
 
     // 4. Create or update budget
     await db.budget.upsert({
