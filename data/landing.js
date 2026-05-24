@@ -10,20 +10,20 @@ import {
   // Stats Data
   export const statsData = [
     {
-      value: "50K+",
-      label: "Active Users",
+      value: "90 Days",
+      label: "Dynamic Demo Seeding",
     },
     {
-      value: "$2B+",
-      label: "Transactions Tracked",
+      value: "1-Click",
+      label: "Gemini OCR Auto-Fill",
     },
     {
-      value: "99.9%",
-      label: "Uptime",
+      value: "Greedy",
+      label: "Debt Simplification Algo",
     },
     {
-      value: "4.9/5",
-      label: "User Rating",
+      value: "Automated",
+      label: "Subscription Billing Cron",
     },
   ];
   

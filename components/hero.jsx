@@ -59,13 +59,12 @@ const HeroSection = () => {
 
         {/* Clear No-Hallucination Advice Box */}
         <div className="max-w-3xl mx-auto p-6 rounded-xl border border-blue-100 bg-blue-50/40 text-left space-y-3">
-          <div className="flex items-center gap-2 text-blue-800 font-bold text-sm">
-            <Lightbulb className="h-4 w-4 text-blue-600 animate-pulse" />
-            Advice for Testers & Reviewers
+          <div className="flex items-center gap-2 text-blue-800 font-extrabold text-base md:text-lg">
+            <Lightbulb className="h-5 w-5 text-blue-600 animate-pulse" />
+            How to Best Test the App:
           </div>
-          <p className="text-xs text-blue-900 leading-relaxed">
-            To see interactive charts, budget limits, and bill-splitting algorithms in action, manual data entry would require weeks of input. 
-            We <strong>highly recommend</strong> logging in and clicking <strong>"Explore with Demo Data"</strong>. This instantly populates your private dashboard with 90 days of transactions, budgets, and friends groups so you can test all features in 10 seconds without any tedious data entry.
+          <p className="text-sm md:text-base text-blue-900/90 leading-relaxed">
+            Instead of manually typing accounts and transactions to see the graphs (which would take days of typing!), we highly recommend logging in and clicking <strong>"Load Demo Data"</strong>. This instantly fills your dashboard with 90 days of sample transactions, budgets, and friends groups so you can test all features in 10 seconds!
           </p>
         </div>
       </div>

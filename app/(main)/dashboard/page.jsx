@@ -92,12 +92,12 @@ export default async function DashboardPage() {
       {/* Onboarding Guide Badge explaining dashboard features */}
       <OnboardingGuide
         storageKey="dashboard_overview"
-        title="Welcome to your Financial Dashboard!"
-        description="This dashboard provides a real-time consolidation of your checking accounts, automated subscription renewals, monthly budget limits, and category-wise expense breakdowns. Choose 'Guided Demo Mode' to immediately see the interactive charts and analytics, or start fresh manually."
+        title="Welcome to your Dashboard! 🚀"
+        description="This is where you can track your money, set budgets, and scan receipts. Choose 'Explore with Demo Data' below to instantly see how the charts and graphs work, or start fresh by adding your own accounts."
         steps={[
-          "Configure checking accounts and budgets using the panels below.",
-          "Manually record expenses or use the AI scanner to read paper receipts.",
-          "Track category breakdown charts and automated subscription bills."
+          "Create a bank account and set a monthly budget.",
+          "Add transactions manually or scan your receipt bills with AI.",
+          "Check the charts and graphs to see where your money goes."
         ]}
       />
 

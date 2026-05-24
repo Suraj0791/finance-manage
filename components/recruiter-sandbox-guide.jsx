@@ -49,9 +49,9 @@ export function RecruiterSandboxGuide() {
   const steps = [
     {
       key: "step1",
-      title: "Step 1: Authenticate",
-      subtitle: "Secure Single-Click Access",
-      desc: "Log in securely in one click via Google or GitHub OAuth. No forms, password resets, or manual profile creation required.",
+      title: "Step 1: Sign In",
+      subtitle: "Fast One-Click Login",
+      desc: "Log in quickly using your Google or GitHub account. No registration forms or passwords needed!",
       icon: <Key className="h-6 w-6 text-indigo-400" />,
       actionText: "Go to Login",
       actionHref: "/login",
@@ -59,17 +59,17 @@ export function RecruiterSandboxGuide() {
     {
       key: "step2",
       title: "Step 2: Load Demo Data",
-      subtitle: "Choose Guided Demo Mode",
-      desc: "On the dashboard onboarding screen, choose 'Guided Demo Mode' to instantly populate your dashboard with 90 days of transaction charts, friends splits, and budgets.",
+      subtitle: "Skip Manual Typing",
+      desc: "Instead of typing transactions one by one, click \"Explore with Demo Data\" on your dashboard to instantly fill it with 90 days of sample data so you can see all charts and features in action.",
       icon: <Database className="h-6 w-6 text-emerald-400" />,
       actionText: "Open Dashboard",
       actionHref: "/dashboard",
     },
     {
       key: "step3",
-      title: "Step 3: Test Gemini OCR",
-      subtitle: "AI Receipt Extraction",
-      desc: "Download our sample receipt and upload it in the 'Add Transaction' panel. Watch the Gemini 2.5 Flash AI extract items, merchant, and totals into input fields.",
+      title: "Step 3: Scan a Receipt",
+      subtitle: "AI Receipt Scanner",
+      desc: "Download our sample receipt and upload it. The AI will read the receipt and fill out the transaction form for you automatically!",
       icon: <ScanLine className="h-6 w-6 text-orange-400" />,
       downloads: [
         { label: "Download PNG", href: "/sample-receipt.png" },
@@ -78,21 +78,12 @@ export function RecruiterSandboxGuide() {
     },
     {
       key: "step4",
-      title: "Step 4: Test Greedy Splitwise",
-      subtitle: "Debt Simplification Algorithm",
-      desc: "Navigate to 'Groups', select the pre-seeded 'Friends (Demo)' group, and record a payment. Our greedy reduction algorithm calculates exactly who owes whom in minimum transfers.",
+      title: "Step 4: Split Bills with Friends",
+      subtitle: "Simple Bill Splitter",
+      desc: "Go to \"Groups\", open the \"Friends (Demo)\" group, and log a shared bill. The app automatically calculates who owes what in the fewest possible bank transfers.",
       icon: <Users className="h-6 w-6 text-violet-400" />,
       actionText: "Explore Groups",
       actionHref: "/groups",
-    },
-    {
-      key: "step5",
-      title: "Step 5: Test Serverless Crons",
-      subtitle: "Automated Subscriptions",
-      desc: "Click 'Simulate Cron' in the dashboard testing toolbar to trigger recurring transaction checks and process subscription renewals automatically.",
-      icon: <Calendar className="h-6 w-6 text-pink-400" />,
-      actionText: "Trigger Simulator",
-      actionHref: "/dashboard",
     }
   ];
 
@@ -103,36 +94,19 @@ export function RecruiterSandboxGuide() {
       <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Banner Announcement */}
-        <div className="max-w-4xl mx-auto mb-16 p-6 rounded-2xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-indigo-500/20 backdrop-blur-md shadow-2xl flex flex-col md:flex-row items-center gap-6">
-          <div className="bg-indigo-500/20 p-4 rounded-xl text-indigo-400">
-            <Sparkles className="h-10 w-10 animate-pulse" />
-          </div>
-          <div className="flex-1 space-y-2 text-center md:text-left">
-            <h3 className="font-bold text-lg text-indigo-200">Reviewing my application?</h3>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              👋 Choose <span className="font-semibold text-emerald-400">[Guided Demo Mode]</span> on the dashboard to instantly populate your profile with 90 days of transactions, a default checking account, and active budget settings. This lets you test the interactive charts and analytics immediately without manual entry!
-            </p>
-          </div>
-          <Link href="/dashboard">
-            <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-6 py-5 rounded-xl shadow-lg hover:shadow-indigo-500/20 transition-all flex items-center gap-2 flex-shrink-0">
-              Try Sandbox
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
+
 
         {/* Section Heading */}
         <div className="text-center mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-400">
             <HelpCircle className="h-3.5 w-3.5 text-indigo-400" />
-            Interactive Sandbox Walkthrough
+            Easy Setup Walkthrough
           </div>
           <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
-            Interactive Test-Drive Roadmap
+            How to Try the App
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-base">
-            Check off steps as you explore the application to see our database-backed serverless architecture and AI engine in action.
+            Follow these 4 simple steps to test all of our features in under a minute!
           </p>
         </div>
 

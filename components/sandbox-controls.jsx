@@ -15,7 +15,7 @@ export function SandboxControls({ hasAccounts }) {
 
   const handleSeed = async () => {
     setLoading(true);
-    const id = toast.loading("Setting up your private demo sandbox...");
+    const id = toast.loading("Loading your demo profile data...");
 
     try {
       const result = await seedTransactions();
@@ -27,7 +27,7 @@ export function SandboxControls({ hasAccounts }) {
           window.location.reload();
         }, 1200);
       } else {
-        toast.error(result.error || "Failed to seed sandbox data.", { id });
+        toast.error(result.error || "Failed to load demo data.", { id });
       }
     } catch (error) {
       console.error(error);
@@ -68,10 +68,10 @@ export function SandboxControls({ hasAccounts }) {
             </div>
             <div>
               <CardTitle className="text-xl sm:text-2xl font-bold">
-                Welcome to your Dashboard! 🚀
+                Welcome! Let's get started 🚀
               </CardTitle>
               <CardDescription className="text-indigo-800/80 text-sm mt-0.5">
-                Let's set up your workspace. Choose how you want to explore the application:
+                Choose how you want to try the app:
               </CardDescription>
             </div>
           </div>
@@ -83,13 +83,13 @@ export function SandboxControls({ hasAccounts }) {
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-xs font-semibold text-indigo-700">
                   <UserCheck className="h-3 w-3" />
-                  Recommended for Testing
+                  Recommended for Quick Test
                 </div>
                 <h4 className="font-bold text-slate-900 group-hover:text-indigo-950 transition-colors">
-                  Option A: Guided Demo Mode
+                  Option A: Explore with Demo Data
                 </h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Instantly populate your account with **90 days of realistic sample transactions**, a pre-configured monthly budget threshold, and a pre-seeded **Splitwise friends group** to test charts, budgets, and bill splitting immediately.
+                  Instantly fill your account with **90 days of dummy transactions**, a monthly budget limit, and a demo friends group so you can test all the charts, budgets, and features right away.
                 </p>
               </div>
               <Button
@@ -100,12 +100,12 @@ export function SandboxControls({ hasAccounts }) {
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Preparing Sandbox...
+                    Loading dummy data...
                   </>
                 ) : (
                   <>
                     <Sparkles className="h-4 w-4" />
-                    Load Demo Data & Tour
+                    Load Demo Data
                   </>
                 )}
               </Button>
@@ -119,10 +119,10 @@ export function SandboxControls({ hasAccounts }) {
                   Start Fresh
                 </div>
                 <h4 className="font-bold text-slate-900 group-hover:text-slate-950 transition-colors">
-                  Option B: Fresh Setup
+                  Option B: Start Clean
                 </h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Start with a blank canvas. Manually configure your accounts and add real-time transactions. Best if you want to use the application to manage your actual personal finances.
+                  Start with an empty dashboard. Create your own accounts and type your own transactions. Best if you want to use this app for your actual daily expenses.
                 </p>
               </div>
               <CreateAccountDrawer>
@@ -141,42 +141,6 @@ export function SandboxControls({ hasAccounts }) {
     );
   }
 
-  // State B: User HAS accounts (Low-profile, non-intrusive toolbar helper)
-  return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 shadow-sm">
-      <div className="flex items-center gap-2.5 text-slate-600 text-xs sm:text-sm">
-        <div className="bg-indigo-100 p-1.5 rounded-lg text-indigo-600">
-          <Lightbulb className="h-4 w-4 animate-pulse flex-shrink-0" />
-        </div>
-        <span>
-          <strong>Testing Sandbox:</strong> You can simulate subscription renewals or re-seed the environment anytime.
-        </span>
-      </div>
-      <div className="flex gap-2 w-full sm:w-auto">
-        <Button
-          onClick={simulateCron}
-          variant="outline"
-          size="sm"
-          className="border-slate-300 text-slate-700 hover:bg-slate-100 text-xs flex-1 sm:flex-none py-1.5 h-8 flex items-center gap-1"
-          title="Simulate automated daily subscription cron run"
-        >
-          <Play className="h-3 w-3" />
-          Simulate Cron
-        </Button>
-        <Button
-          onClick={handleSeed}
-          disabled={loading}
-          variant="ghost"
-          size="sm"
-          className="text-xs text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50/50 flex-1 sm:flex-none py-1.5 h-8 font-medium"
-        >
-          {loading ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            "Reset/Re-seed Demo Data"
-          )}
-        </Button>
-      </div>
-    </div>
-  );
+  // State B: User HAS accounts (hide sandbox controls completely for a clean dashboard)
+  return null;
 }
