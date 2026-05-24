@@ -157,7 +157,7 @@ export function SandboxControls({ hasAccounts }) {
           onClick={simulateCron}
           variant="outline"
           size="sm"
-          className="border-slate-350 text-slate-700 hover:bg-slate-100 text-xs flex-1 sm:flex-none py-1.5 h-8 flex items-center gap-1"
+          className="border-slate-300 text-slate-700 hover:bg-slate-100 text-xs flex-1 sm:flex-none py-1.5 h-8 flex items-center gap-1"
           title="Simulate automated daily subscription cron run"
         >
           <Play className="h-3 w-3" />

@@ -233,6 +233,40 @@ export default function PlaygroundPage() {
 
   // --- Charts State ---
   const [chartScenario, setChartScenario] = useState("typical");
+  const [chartData, setChartData] = useState(mockChartData);
+
+  const addDemoTransactionToChart = (amount) => {
+    setChartData((prev) => {
+      const updatedScenarioData = prev[chartScenario].map((item, index) => {
+        // May is the last item (index 4)
+        if (index === prev[chartScenario].length - 1) {
+          return {
+            ...item,
+            Expenses: item.Expenses + amount,
+          };
+        }
+        return item;
+      });
+      return {
+        ...prev,
+        [chartScenario]: updatedScenarioData,
+      };
+    });
+  };
+
+  const handleDemoSubmit = () => {
+    if (!ocrResult || !ocrResult.amount) return;
+
+    addDemoTransactionToChart(ocrResult.amount);
+
+    toast.success(`Demo transaction of $${ocrResult.amount.toFixed(2)} saved!`, {
+      description: "Added to the Interactive Charts tab. Go check it out!",
+      duration: 5000,
+    });
+
+    setOcrFile(null);
+    setOcrResult(null);
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pt-28 pb-16 px-4 relative overflow-hidden">
@@ -310,8 +344,8 @@ export default function PlaygroundPage() {
                     <span className="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full">Gemini 2.5 Flash AI</span>
                   </div>
                   <h3 className="text-lg font-bold text-slate-200">What is Gemini OCR?</h3>
-                  <p className="text-xs text-slate-350 leading-relaxed max-w-3xl">
-                    This scanner instantly reads any paper bill or receipt image and <strong className="text-indigo-300">automatically pre-fills the transaction form</strong>. There is absolutely no need to write down merchant names, dates, categories, or amounts manually every time! Just upload your bill, chill out, and watch the AI extract all details instantly.
+                  <p className="text-xs text-slate-400 leading-relaxed max-w-3xl">
+                    Who wants to manually fill out transaction forms for every cafe visit, restaurant dinner, or petrol run? Just scan the bill, and let our Gemini AI auto-populate the fields and manage the transaction details for you instantly!
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-indigo-400 font-semibold bg-indigo-950/40 px-3 py-1.5 rounded-xl border border-indigo-900/50">
@@ -341,13 +375,13 @@ export default function PlaygroundPage() {
                   <p className="text-slate-400">Download our pre-rendered receipt to test with:</p>
                   <div className="flex gap-2">
                     <a href="/sample-receipt.png" download className="flex-1">
-                      <Button variant="outline" size="sm" className="w-full text-slate-350 border-slate-800 text-[10px] hover:bg-slate-900 py-1.5 h-7">
+                      <Button variant="outline" size="sm" className="w-full bg-slate-950 text-slate-300 hover:text-slate-100 border-slate-800 text-[10px] hover:bg-slate-900 py-1.5 h-7">
                         <Download className="h-3 w-3 mr-1" />
                         Download PNG
                       </Button>
                     </a>
                     <a href="/sample-receipt.svg" download className="flex-1">
-                      <Button variant="outline" size="sm" className="w-full text-slate-350 border-slate-800 text-[10px] hover:bg-slate-900 py-1.5 h-7">
+                      <Button variant="outline" size="sm" className="w-full bg-slate-950 text-slate-300 hover:text-slate-100 border-slate-800 text-[10px] hover:bg-slate-900 py-1.5 h-7">
                         <Download className="h-3 w-3 mr-1" />
                         Download SVG
                       </Button>
@@ -389,66 +423,152 @@ export default function PlaygroundPage() {
             </Card>
 
             {/* Right Result Panel */}
-            <Card className="bg-slate-900/60 border-slate-800 text-slate-100 p-6 flex flex-col justify-center">
-              {ocrLoading ? (
-                <div className="text-center space-y-3 py-12">
-                  <Loader2 className="h-8 w-8 text-indigo-500 animate-spin mx-auto" />
-                  <p className="text-sm text-slate-400">Gemini AI is reading and extracting text details...</p>
-                </div>
-              ) : ocrResult ? (
-                <div className="space-y-6">
-                  <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
-                    <h4 className="font-bold text-slate-200">AI Extraction Output</h4>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                      <CheckCircle2 className="h-3 w-3" />
-                      Gemini Verified
-                    </span>
-                  </div>
-
-                  {/* Receipt Details Card mockup */}
-                  <div className="bg-white text-slate-900 rounded-xl p-6 font-mono text-sm max-w-sm mx-auto shadow-xl">
-                    <div className="text-center border-b border-dashed border-slate-300 pb-3 mb-4">
-                      <div className="font-bold text-base tracking-wide uppercase">
-                        {ocrResult.merchantName || "Unknown Merchant"}
-                      </div>
-                      <div className="text-xs text-slate-500 mt-1">
-                        Date: {ocrResult.date ? new Date(ocrResult.date).toLocaleDateString() : "N/A"}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 mb-4">
-                      <div className="flex justify-between text-xs">
-                        <span>Description:</span>
-                        <span className="font-semibold text-right max-w-[200px] truncate">{ocrResult.description || "N/A"}</span>
-                      </div>
-                      <div className="flex justify-between text-xs">
-                        <span>Suggested Category:</span>
-                        <span className="font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full text-[10px]">
-                          {ocrResult.category || "other"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="border-t border-slate-300 pt-3 flex justify-between font-bold text-base">
-                      <span>TOTAL:</span>
-                      <span>{formatCurrency(ocrResult.amount || 0)}</span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-12 space-y-3">
-                  <div className="w-12 h-12 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-center mx-auto text-slate-600">
-                    <FileText className="h-6 w-6" />
-                  </div>
-                  <h4 className="text-sm font-semibold text-slate-300">No active scan</h4>
-                  <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
-                    Upload a receipt image on the left. The Gemini AI engine will parse it and show the structured JSON output here.
-                  </p>
+            <Card className="bg-slate-900/60 border-slate-800 text-slate-100 p-6 flex flex-col justify-between min-h-[480px] relative overflow-hidden">
+              {ocrLoading && (
+                <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center space-y-3">
+                  <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+                  <p className="text-sm text-slate-400">Gemini AI is reading and extracting receipt details...</p>
                 </div>
               )}
+              
+              <div>
+                <div className="border-b border-slate-800 pb-3 flex items-center justify-between mb-4">
+                  <h4 className="font-bold text-slate-200 flex items-center gap-2">
+                    <FileText className="h-4.5 w-4.5 text-indigo-400" />
+                    Transaction Form Auto-Fill Preview
+                  </h4>
+                  {ocrResult && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 animate-pulse font-medium">
+                      <Sparkles className="h-3 w-3" />
+                      AI Auto-Filled
+                    </span>
+                  )}
+                </div>
+
+                <div className="space-y-4 text-xs">
+                  {/* Type */}
+                  <div className="space-y-1">
+                    <label className="font-semibold text-slate-400">Transaction Type</label>
+                    <select
+                      disabled
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-400 cursor-not-allowed"
+                      value="EXPENSE"
+                    >
+                      <option value="EXPENSE">Expense</option>
+                      <option value="INCOME">Income</option>
+                    </select>
+                  </div>
+
+                  {/* Amount */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <label className="font-semibold text-slate-400">Amount ($)</label>
+                      {ocrResult?.amount && (
+                        <span className="text-[10px] text-emerald-400 flex items-center gap-0.5 font-medium animate-pulse">
+                          ✨ AI Auto-filled
+                        </span>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <span className="absolute left-3 top-2 text-slate-500 font-semibold">$</span>
+                      <input
+                        type="text"
+                        disabled
+                        placeholder="0.00"
+                        className={`w-full bg-slate-950 border rounded-lg pl-6 pr-3 py-2 text-slate-200 font-mono transition-all ${
+                          ocrResult?.amount ? "border-emerald-500/50 text-emerald-300 bg-emerald-950/20 shadow-[0_0_10px_rgba(16,185,129,0.05)]" : "border-slate-800 text-slate-500"
+                        }`}
+                        value={ocrResult?.amount ? ocrResult.amount.toFixed(2) : ""}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Merchant/Description */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <label className="font-semibold text-slate-400">Description / Merchant</label>
+                      {ocrResult?.merchantName || ocrResult?.description ? (
+                        <span className="text-[10px] text-emerald-400 flex items-center gap-0.5 font-medium animate-pulse">
+                          ✨ AI Auto-filled
+                        </span>
+                      ) : null}
+                    </div>
+                    <input
+                      type="text"
+                      disabled
+                      placeholder="e.g. Starbucks, Restaurant, Petrol"
+                      className={`w-full bg-slate-950 border rounded-lg px-3 py-2 transition-all ${
+                        ocrResult?.merchantName || ocrResult?.description ? "border-emerald-500/50 text-slate-200 bg-emerald-950/20 shadow-[0_0_10px_rgba(16,185,129,0.05)]" : "border-slate-800 text-slate-500"
+                      }`}
+                      value={ocrResult?.merchantName || ocrResult?.description || ""}
+                    />
+                  </div>
+
+                  {/* Category */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <label className="font-semibold text-slate-400">Category</label>
+                      {ocrResult?.category && (
+                        <span className="text-[10px] text-emerald-400 flex items-center gap-0.5 font-medium animate-pulse">
+                          ✨ AI Auto-filled
+                        </span>
+                      )}
+                    </div>
+                    <input
+                      type="text"
+                      disabled
+                      placeholder="e.g. Food, Utilities, Transport"
+                      className={`w-full bg-slate-950 border rounded-lg px-3 py-2 capitalize transition-all ${
+                        ocrResult?.category ? "border-emerald-500/50 text-slate-200 bg-emerald-950/20 shadow-[0_0_10px_rgba(16,185,129,0.05)]" : "border-slate-800 text-slate-500"
+                      }`}
+                      value={ocrResult?.category || ""}
+                    />
+                  </div>
+
+                  {/* Date */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <label className="font-semibold text-slate-400">Date</label>
+                      {ocrResult?.date && (
+                        <span className="text-[10px] text-emerald-400 flex items-center gap-0.5 font-medium animate-pulse">
+                          ✨ AI Auto-filled
+                        </span>
+                      )}
+                    </div>
+                    <input
+                      type="text"
+                      disabled
+                      placeholder="YYYY-MM-DD"
+                      className={`w-full bg-slate-950 border rounded-lg px-3 py-2 font-mono transition-all ${
+                        ocrResult?.date ? "border-emerald-500/50 text-slate-200 bg-emerald-950/20 shadow-[0_0_10px_rgba(16,185,129,0.05)]" : "border-slate-800 text-slate-500"
+                      }`}
+                      value={ocrResult?.date ? new Date(ocrResult.date).toISOString().split('T')[0] : ""}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6">
+                {ocrResult ? (
+                  <Button
+                    onClick={handleDemoSubmit}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow-lg shadow-emerald-900/20 border-none transition-all flex items-center justify-center gap-2 hover:scale-[1.01]"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Save Transaction (Demo)
+                  </Button>
+                ) : (
+                  <div className="p-3 bg-slate-950/60 border border-slate-850 rounded-xl text-center text-slate-500">
+                    <p className="text-[11px] leading-relaxed">
+                      💡 Upload a receipt image on the left. The AI scanner will instantly extract details and fill this form for you!
+                    </p>
+                  </div>
+                )}
+              </div>
             </Card>
           </div>
-        )}
+        </div>
+      )}
 
         {/* --- BILL SPLIT SOLVER TAB CONTENT --- */}
         {activeTab === "split" && (
@@ -462,7 +582,7 @@ export default function PlaygroundPage() {
                     <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full">Algorithm Solver</span>
                   </div>
                   <h3 className="text-lg font-bold text-slate-200">What is Bill Simplification?</h3>
-                  <p className="text-xs text-slate-350 leading-relaxed max-w-3xl">
+                  <p className="text-xs text-slate-400 leading-relaxed max-w-3xl">
                     Easily split bills and group expenses among your friends—that's all! Just enter who is in your group and log whatever expenses were paid by different people. Our <strong className="text-emerald-300">greedy debt-simplification algorithm</strong> automatically calculates everyone's share and outputs the exact, optimized list of who needs to pay whom, minimizing the total number of transactions. No messy math or endless transfers required!
                   </p>
                 </div>
@@ -616,7 +736,8 @@ export default function PlaygroundPage() {
               </div>
             </Card>
           </div>
-        )}
+        </div>
+      )}
 
         {/* --- CHARTS TAB CONTENT --- */}
         {activeTab === "charts" && mounted && (
@@ -630,7 +751,7 @@ export default function PlaygroundPage() {
                     <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full">Interactive Analytics</span>
                   </div>
                   <h3 className="text-lg font-bold text-slate-200">What are Interactive Charts?</h3>
-                  <p className="text-xs text-slate-350 leading-relaxed max-w-3xl">
+                  <p className="text-xs text-slate-400 leading-relaxed max-w-3xl">
                     These interactive charts visualize your income vs. expense breakdown in real-time. Try toggling between different financial profiles (like a typical budget, a high vacation expense spike, or an aggressive saving month) to watch the <strong className="text-amber-300">animated graphs automatically recalculate and redraw</strong>. This simulates how the app behaves when logging different spending habits.
                   </p>
                 </div>
@@ -654,22 +775,34 @@ export default function PlaygroundPage() {
               <div className="space-y-2 pt-2">
                 <Button
                   onClick={() => setChartScenario("typical")}
-                  variant={chartScenario === "typical" ? "default" : "outline"}
-                  className="w-full justify-start text-xs border-slate-800 text-slate-350"
+                  variant="outline"
+                  className={`w-full justify-start text-xs border-slate-800 transition-colors ${
+                    chartScenario === "typical"
+                      ? "bg-indigo-600 hover:bg-indigo-700 text-white hover:text-white font-semibold"
+                      : "bg-slate-950 text-slate-400 hover:bg-slate-900 hover:text-slate-200"
+                  }`}
                 >
                   🟢 Scenario 1: Typical Saving & Spending
                 </Button>
                 <Button
                   onClick={() => setChartScenario("vacation")}
-                  variant={chartScenario === "vacation" ? "default" : "outline"}
-                  className="w-full justify-start text-xs border-slate-800 text-slate-350"
+                  variant="outline"
+                  className={`w-full justify-start text-xs border-slate-800 transition-colors ${
+                    chartScenario === "vacation"
+                      ? "bg-indigo-600 hover:bg-indigo-700 text-white hover:text-white font-semibold"
+                      : "bg-slate-950 text-slate-400 hover:bg-slate-900 hover:text-slate-200"
+                  }`}
                 >
                   🔴 Scenario 2: High Vacation Spending
                 </Button>
                 <Button
                   onClick={() => setChartScenario("saving")}
-                  variant={chartScenario === "saving" ? "default" : "outline"}
-                  className="w-full justify-start text-xs border-slate-800 text-slate-350"
+                  variant="outline"
+                  className={`w-full justify-start text-xs border-slate-800 transition-colors ${
+                    chartScenario === "saving"
+                      ? "bg-indigo-600 hover:bg-indigo-700 text-white hover:text-white font-semibold"
+                      : "bg-slate-950 text-slate-400 hover:bg-slate-900 hover:text-slate-200"
+                  }`}
                 >
                   🔵 Scenario 3: Aggressive Saving Month
                 </Button>
@@ -689,7 +822,7 @@ export default function PlaygroundPage() {
             <Card className="bg-slate-900/60 border-slate-800 text-slate-100 p-5 md:col-span-2 space-y-6">
               <div className="h-[240px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={mockChartData[chartScenario]}>
+                  <AreaChart data={chartData[chartScenario]}>
                     <defs>
                       <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2}/>
