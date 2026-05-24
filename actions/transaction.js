@@ -223,7 +223,7 @@ export async function scanReceipt(file) {
       throw new Error("Rate limit exceeded. Please wait a few minutes before scanning another receipt.");
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Convert File to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
