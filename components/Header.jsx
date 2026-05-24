@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "./ui/button";
-import { PenBox, LayoutDashboard, Users, LogOut } from "lucide-react";
+import { PenBox, LayoutDashboard, Users, LogOut, Sparkles } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { auth, signOut } from "@/auth";
@@ -35,14 +35,12 @@ const Header = async () => {
         <div className="hidden md:flex items-center space-x-8">
           {!isLoggedIn && (
             <>
+              <Link href="/playground" className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1">
+                <Sparkles className="h-4 w-4 animate-pulse" />
+                Try Interactive Sandbox
+              </Link>
               <a href="#features" className="text-gray-600 hover:text-blue-600">
                 Features
-              </a>
-              <a
-                href="#testimonials"
-                className="text-gray-600 hover:text-blue-600"
-              >
-                Testimonials
               </a>
             </>
           )}
