@@ -37,6 +37,8 @@
     "react-dom": "^19.0.0-rc-66855b96-20241106",
     "react-hook-form": "^7.53.2",
     "react-spinners": "^0.14.1",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
     "recharts": "^2.14.1",
     "resend": "^4.0.1",
     "sonner": "^1.7.0",

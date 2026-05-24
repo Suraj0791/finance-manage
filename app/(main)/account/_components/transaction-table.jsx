@@ -12,9 +12,14 @@ import {
   ChevronRight,
   RefreshCw,
   Clock,
+  Download,
+  FileText,
+  FileSpreadsheet,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 import {
   Table,
@@ -196,6 +201,126 @@ export function TransactionTable({ transactions }) {
     setSelectedIds([]); // Clear selections on page change
   };
 
+  const exportToCsv = () => {
+    try {
+      const csvData = [
+        ["Date", "Description", "Category", "Type", "Amount", "Recurring"],
+        ...filteredAndSortedTransactions.map((t) => [
+          format(new Date(t.date), "yyyy-MM-dd"),
+          t.description || "",
+          t.category,
+          t.type,
+          t.amount.toFixed(2),
+          t.isRecurring ? "Yes" : "No",
+        ]),
+      ];
+
+      const csvContent =
+        "data:text/csv;charset=utf-8," +
+        encodeURIComponent(
+          csvData.map((row) => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(",")).join("\n")
+        );
+
+      const link = document.createElement("a");
+      link.setAttribute("href", csvContent);
+      link.setAttribute(
+        "download",
+        `statement_${format(new Date(), "yyyyMMdd")}.csv`
+      );
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success("Transactions exported to CSV successfully!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to export transactions");
+    }
+  };
+
+  const exportToPdf = () => {
+    try {
+      const doc = new jsPDF();
+      
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(20);
+      doc.setTextColor(147, 51, 234);
+      doc.text("WELTH", 14, 20);
+      
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100);
+      doc.text("Personal Financial Statement", 14, 26);
+      doc.text(`Generated on: ${format(new Date(), "PPpp")}`, 14, 32);
+
+      const totalIncome = filteredAndSortedTransactions
+        .filter(t => t.type === "INCOME")
+        .reduce((sum, t) => sum + Number(t.amount), 0);
+      const totalExpense = filteredAndSortedTransactions
+        .filter(t => t.type === "EXPENSE")
+        .reduce((sum, t) => sum + Number(t.amount), 0);
+      const netSavings = totalIncome - totalExpense;
+
+      doc.setFillColor(243, 244, 246);
+      doc.rect(14, 38, 182, 22, "F");
+      
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(80);
+      doc.text("SUMMARY OF PERIOD", 20, 44);
+      
+      doc.setFont("helvetica", "normal");
+      doc.text(`Total Income: $${totalIncome.toFixed(2)}`, 20, 52);
+      doc.text(`Total Expenses: $${totalExpense.toFixed(2)}`, 80, 52);
+      
+      if (netSavings >= 0) {
+        doc.setTextColor(16, 185, 129);
+        doc.text(`Net Savings: +$${netSavings.toFixed(2)}`, 140, 52);
+      } else {
+        doc.setTextColor(239, 68, 68);
+        doc.text(`Net Savings: -$${Math.abs(netSavings).toFixed(2)}`, 140, 52);
+      }
+
+      const tableColumn = ["Date", "Description", "Category", "Type", "Amount", "Recurring"];
+      const tableRows = filteredAndSortedTransactions.map((t) => [
+        format(new Date(t.date), "dd MMM yyyy"),
+        t.description || "N/A",
+        t.category.toUpperCase(),
+        t.type,
+        `$${Number(t.amount).toFixed(2)}`,
+        t.isRecurring ? "Recurring" : "One-time"
+      ]);
+
+      doc.autoTable({
+        startY: 66,
+        head: [tableColumn],
+        body: tableRows,
+        theme: "striped",
+        headStyles: { fillColor: [147, 51, 234] },
+        alternateRowStyles: { fillColor: [250, 245, 255] },
+        margin: { top: 66 },
+        styles: { fontSize: 8 },
+        didParseCell: function(data) {
+          if (data.section === 'body' && data.column.index === 3) {
+            if (data.cell.raw === 'INCOME') {
+              data.cell.styles.textColor = [16, 185, 129];
+              data.cell.styles.fontStyle = 'bold';
+            } else {
+              data.cell.styles.textColor = [239, 68, 68];
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        }
+      });
+
+      doc.save(`financial_statement_${format(new Date(), "yyyyMMdd")}.pdf`);
+      toast.success("Statement exported as PDF successfully!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to export PDF statement");
+    }
+  };
+
   return (
     <div className="space-y-4">
       {deleteLoading && (
@@ -247,6 +372,25 @@ export function TransactionTable({ transactions }) {
               <SelectItem value="non-recurring">Non-recurring Only</SelectItem>
             </SelectContent>
           </Select>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <Download className="h-4 w-4" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={exportToCsv} className="cursor-pointer">
+                <FileSpreadsheet className="h-4 w-4 mr-2 text-emerald-600" />
+                Export to CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={exportToPdf} className="cursor-pointer">
+                <FileText className="h-4 w-4 mr-2 text-purple-600" />
+                Export as PDF Statement
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Bulk Actions */}
           {selectedIds.length > 0 && (
