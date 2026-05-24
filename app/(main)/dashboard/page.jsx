@@ -13,6 +13,7 @@ import { DashboardOverview } from "./_components/transaction-overview";
 import { DashboardFallback } from "./_components/dashboard-fallback";
 import { DashboardSkeleton } from "@/components/ui/loading";
 import { SandboxControls } from "@/components/sandbox-controls";
+import { OnboardingGuide } from "@/components/onboarding-guide";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
@@ -87,6 +88,19 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       {/* Recruiter Developer Sandbox Console */}
       <SandboxControls hasAccounts={hasAccounts} />
+
+      {/* Onboarding Guide Badge explaining dashboard features */}
+      <OnboardingGuide
+        storageKey="dashboard_overview"
+        title="Welcome to your Financial Dashboard!"
+        description="This dashboard provides a real-time consolidation of your checking accounts, automated subscription renewals, monthly budget limits, and category-wise expense breakdowns. Choose 'Guided Demo Mode' to immediately see the interactive charts and analytics, or start fresh manually."
+        steps={[
+          "Configure checking accounts and budgets using the panels below.",
+          "Manually record expenses or use the AI scanner to read paper receipts.",
+          "Track category breakdown charts and automated subscription bills."
+        ]}
+      />
+
       {/* Database Status */}
       <Suspense fallback={<div>Checking database connection...</div>}>
         <DatabaseStatus />
