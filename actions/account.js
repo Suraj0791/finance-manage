@@ -143,8 +143,65 @@ export async function updateDefaultAccount(accountId) {
     });
 
     revalidatePath("/dashboard");
-    return { success: true, data: serializeTransaction(account) };
+    return { success: true, data: serializeDecimal(account) }; // Corrected helper call
   } catch (error) {
     return { success: false, error: error.message };
+  }
+}
+
+export async function getAccountDetails(accountId) {
+  try {
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    const account = await db.account.findUnique({
+      where: {
+        id: accountId,
+        userId: user.id,
+      },
+      include: {
+        _count: {
+          select: { transactions: true },
+        },
+      },
+    });
+
+    if (!account) return null;
+    return serializeDecimal(account);
+  } catch (error) {
+    console.error("Error getting account details:", error);
+    return null;
+  }
+}
+
+export async function getAccountTransactions(accountId) {
+  try {
+    const session = await auth();
+    if (!session?.user?.email) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    const transactions = await db.transaction.findMany({
+      where: {
+        accountId,
+        userId: user.id,
+      },
+      orderBy: { date: "desc" },
+    });
+
+    return transactions.map(serializeDecimal);
+  } catch (error) {
+    console.error("Error getting account transactions:", error);
+    return [];
   }
 }

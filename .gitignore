@@ -30,6 +30,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+cqa.md
+technical_insights.md
+interview_prep.md
+codebase_story.md
+
 # env files (can opt-in for committing if needed)
 .env*
 .env
@@ -40,3 +45,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+qa.md 

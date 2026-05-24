@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getAccountWithTransactions } from "@/actions/account";
+import { getAccountDetails, getAccountTransactions } from "@/actions/account";
 import { BarLoader } from "react-spinners";
 import { TransactionTable } from "../_components/transaction-table";
 import { notFound } from "next/navigation";
@@ -9,13 +9,12 @@ export default async function AccountPage({ params: rawParams }) {
   // Await and resolve params
   const params = await rawParams;
 
-  const accountData = await getAccountWithTransactions(params.id);
+  // Fetch only the account details first (very fast, <15ms)
+  const account = await getAccountDetails(params.id);
 
-  if (!accountData) {
+  if (!account) {
     notFound();
   }
-
-  const { transactions, ...account } = accountData;
 
   return (
     <div className="space-y-8 px-5">
@@ -40,19 +39,23 @@ export default async function AccountPage({ params: rawParams }) {
         </div>
       </div>
 
-      {/* Chart Section */}
+      {/* Transactions Section is loaded asynchronously and streamed in */}
       <Suspense
-        fallback={<BarLoader className="mt-4" width={"100%"} color="#9333ea" />}
+        fallback={<BarLoader className="mt-8" width={"100%"} color="#9333ea" />}
       >
-        <AccountChart transactions={transactions} />
+        <TransactionsWrapper accountId={params.id} />
       </Suspense>
+    </div>
+  );
+}
 
-      {/* Transactions Table */}
-      <Suspense
-        fallback={<BarLoader className="mt-4" width={"100%"} color="#9333ea" />}
-      >
-        <TransactionTable transactions={transactions} />
-      </Suspense>
+// Subcomponent to query transactions dynamically and stream them
+async function TransactionsWrapper({ accountId }) {
+  const transactions = await getAccountTransactions(accountId);
+  return (
+    <div className="space-y-8">
+      <AccountChart transactions={transactions} />
+      <TransactionTable transactions={transactions} />
     </div>
   );
 }
